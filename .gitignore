@@ -3,10 +3,10 @@
 *vs
 *.sln
 *.vsconfig
-*/Binaries
-*/DerivedDataCache
-*/Intermediate
-*/Saved
+/Binaries
+/DerivedDataCache
+/Intermediate
+/Saved
 # Content二进制文件较大
-*/Content
-*/Build
+/Content
+/Build
