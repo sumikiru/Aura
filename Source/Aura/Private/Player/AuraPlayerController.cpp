@@ -9,6 +9,9 @@
 
 AAuraPlayerController::AAuraPlayerController()
 {
+	LastActor = nullptr;
+	CurrentActor = nullptr;
+	
 	bReplicates = true;
 }
 

@@ -12,6 +12,11 @@ AAuraCharacterBase::AAuraCharacterBase()
 	Weapon->SetCollisionProfileName(FName("NoCollision"));
 }
 
+UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
 void AAuraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
