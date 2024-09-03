@@ -8,9 +8,9 @@
 
 UAuraAttributeSet::UAuraAttributeSet()
 {
-	InitHealth(100.f);//ATTRIBUTE_ACCESSORS(ClassName, PropertyName)中的GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)使其可行
+	InitHealth(50.f);//ATTRIBUTE_ACCESSORS(ClassName, PropertyName)中的GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)使其可行
 	InitMaxHealth(100.f);
-	InitMana(50.f);
+	InitMana(30.f);
 	InitMaxMana(50.f);
 }
 

@@ -87,15 +87,18 @@ void AAuraPlayerController::BeginPlay()
 	check(AuraInputMappingContext);
 
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(Subsystem);
-	Subsystem->AddMappingContext(AuraInputMappingContext, 0);
+	//不应check(Subsystem);仅在本地的客户端中不为空
+	if(Subsystem)
+	{
+		Subsystem->AddMappingContext(AuraInputMappingContext, 0);
+	}
 
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
 
 	FInputModeGameAndUI InputModeData;
 	InputModeData.SetHideCursorDuringCapture(false);
-	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
+	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	SetInputMode(InputModeData);
 }
 
