@@ -35,6 +35,11 @@ private:
 
 	void Move(const FInputActionValue& InputActionValue);
 	void CursorTrace();
-	TObjectPtr<IEnemyInterface> LastActor;
-	TObjectPtr<IEnemyInterface> CurrentActor;
+	/*
+	 * 对于需要进行访问追踪的UPROPERTY成员变量，可以使用TObjPtr<T>来替换裸指针
+	 * 对于函数参数、局部指针变量等，则建议使用UObject* 裸指针
+	 * TObjPtr作为UPROPERTY成员时可以完全替换裸指针，且在release版本时完全等于裸指针
+	 */
+	IEnemyInterface* LastActor;
+	IEnemyInterface* CurrentActor;
 };
