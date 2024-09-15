@@ -15,6 +15,11 @@ class AURA_API UAuraUserWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	/**
+	 * 让AuraHUD的OverlayWidget指定当前的WidgetController，并执行事件SetWidgetController: \n
+	 * OverlayWidget->SetWidgetController(WidgetController); \n
+	 * 并且存储好WidgetController = InWidgetController以备使用
+	 */
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetController(UObject* InWidgetController);
 	

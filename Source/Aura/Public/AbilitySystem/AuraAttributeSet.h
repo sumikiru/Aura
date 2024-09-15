@@ -13,6 +13,9 @@
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+/*单播委托，只能绑定一个function，且非动态类型，无法暴露给蓝图*/
+//DECLARE_DELEGATE_RetVal(FGameplayAttribute, FAttributeSignature);
+
 USTRUCT()
 struct FEffectProperties
 {
@@ -41,6 +44,9 @@ struct FEffectProperties
 	ACharacter* TargetCharacter = nullptr;
 };
 
+template <class T>
+using TStaticFuncPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
+
 /**
  * 
  */
@@ -51,9 +57,9 @@ class AURA_API UAuraAttributeSet : public UAttributeSet
 
 public:
 	/**
-	 * 1.声明变量，并使用ReplicatedUsing标记符
-	 * 2.使用RepNotify，确认其拥有Gameplay Attribute和RepNotify宏
-	 * 3.添加DOREPLIFETIME_CONDITION_NOTIFY宏以重复获取终身复制的属性，使其复制
+	 * 1.声明变量，并使用ReplicatedUsing标记符\n
+	 * 2.使用RepNotify，确认其拥有Gameplay Attribute和RepNotify宏\n
+	 * 3.添加DOREPLIFETIME_CONDITION_NOTIFY宏以重复获取终身复制的属性，使其复制\n
 	 * 4.设置rncond为REPNOTIFY_Always
 	 */
 	UAuraAttributeSet();
@@ -62,6 +68,19 @@ public:
 	//主要为了FMath::Clamp设计的
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+
+	/*本质上是FGameplayAttribute(*)()*/
+	//using AttrFuncPtr = TBaseStaticDelegateInstance<FGameplayAttribute(), FDefaultDelegateUserPolicy>::FFuncPtr;
+	//TMap<FGameplayTag, FGameplayAttribute(*)()> TagsToAttributes;//或者TMap<FGameplayTag, AttrFuncPtr> TagsToAttributes;
+	/**
+	 * 定义了一个指向静态委托实例的函数指针，该委托返回FGameplayAttribute，并使用默认委托用户策略 \n
+	 * RetValType(ParamType...)为FGameplayAttribute()，其没有参数Param \n
+	 * UserPolicy为FDefaultDelegateUserPolicy \n
+	 * VarTypes也为空 \n
+	 * FFuncPtr为类TBaseStaticDelegateInstance的public成员，是RetValType(*)(ParamTypes..., VarTypes...)的别名，表示函数指针
+	 */
+	//AttrFuncPtr FunctionPointer;
+	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
 	
 	/**
 	 * Primary Attributes
@@ -84,7 +103,7 @@ public:
 	FGameplayAttributeData Vigor;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Vigor);
 
-	/*
+	/**
 	 * Secondary Attributes
 	 */
 	
