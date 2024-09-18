@@ -24,4 +24,5 @@ class AURA_API ICombatInterface
 public:
 	//不应该为純虚函数，AuraCharacterBase并不重写
 	virtual int32 GetPlayerLevel();
+	virtual FVector GetCombatSocketLocation();
 };
