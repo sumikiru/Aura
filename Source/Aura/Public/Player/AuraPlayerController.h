@@ -36,8 +36,13 @@ private:
 	TObjectPtr<UInputMappingContext> AuraInputMappingContext;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> MoveAction;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> ShiftAction;
 
 	void Move(const FInputActionValue& InputActionValue);
+	void ShiftPressed() { bShiftKeyDown = true; };
+	void ShiftReleased() { bShiftKeyDown = false; };
+	bool bShiftKeyDown = false;
 	void CursorTrace();
 	/**
 	 * 对于需要进行访问追踪的UPROPERTY成员变量，可以使用TObjPtr<T>来替换裸指针 \n

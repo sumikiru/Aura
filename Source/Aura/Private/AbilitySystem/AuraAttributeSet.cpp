@@ -44,7 +44,7 @@ UAuraAttributeSet::UAuraAttributeSet()
 
 void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);//必须要加上
 
 	// Primary Attributes
 	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, Strength, COND_None, REPNOTIFY_Always);
@@ -101,10 +101,12 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	if(Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+		//GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Red, FString::Printf(TEXT("%s 的Health: %f"), *Props.TargetAvatarActor->GetName() ,GetHealth()));
 	}
 	if(Data.EvaluatedData.Attribute == GetManaAttribute())
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+		//GEngine->AddOnScreenDebugMessage(2, 30.f, FColor::Red, FString::Printf(TEXT("%s 的Mana: %f"), *Props.TargetAvatarActor->GetName() ,GetMana()));
 	}
 }
 
