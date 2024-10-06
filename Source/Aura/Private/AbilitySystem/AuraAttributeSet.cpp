@@ -8,7 +8,10 @@
 #include "AbilitySystemComponent.h"
 #include "AuraGameplayTags.h"
 #include "GameFramework/Character.h"
+#include "Interaction/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/AuraPlayerController.h"
 
 UAuraAttributeSet::UAuraAttributeSet()
 {
@@ -101,12 +104,51 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	if(Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
-		//GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Red, FString::Printf(TEXT("%s 的Health: %f"), *Props.TargetAvatarActor->GetName() ,GetHealth()));
 	}
 	if(Data.EvaluatedData.Attribute == GetManaAttribute())
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
-		//GEngine->AddOnScreenDebugMessage(2, 30.f, FColor::Red, FString::Printf(TEXT("%s 的Mana: %f"), *Props.TargetAvatarActor->GetName() ,GetMana()));
+	}
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		// 缓存该值
+		const float LocalIncomingDamage = GetIncomingDamage();
+		// 重置IncomingDamage为0
+		SetIncomingDamage(0.f);
+		if (LocalIncomingDamage > 0.f)
+		{
+			const float NewHealth = GetHealth() - LocalIncomingDamage;
+			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+
+			const bool bFatal = NewHealth <= 0.f; // 伤害是否致命
+			if (bFatal)
+			{
+				if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor))
+				{
+					CombatInterface->Die();
+				}
+			}
+			else
+			{
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(FAuraGameplayTags::Get().Effects_HitReact);
+				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
+
+			// 显示伤害数字
+			ShowFloatingDamageText(Props, LocalIncomingDamage);
+		}
+	}
+}
+
+void UAuraAttributeSet::ShowFloatingDamageText(const FEffectProperties& Props, float Damage) const
+{
+	if (Props.SourceCharacter != Props.TargetCharacter)
+	{
+		if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0)))
+		{
+			PC->ShowDamageNumber(Damage, Props.TargetCharacter);
+		}
 	}
 }
 

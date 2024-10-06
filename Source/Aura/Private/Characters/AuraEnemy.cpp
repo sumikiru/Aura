@@ -3,11 +3,13 @@
 
 #include "Characters/AuraEnemy.h"
 
+#include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "Aura/Aura.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "UI/Widget/AuraUserWidget.h"
 
 AAuraEnemy::AAuraEnemy()
@@ -47,10 +49,24 @@ int32 AAuraEnemy::GetPlayerLevel()
 	return Level;
 }
 
+void AAuraEnemy::Die()
+{
+	SetLifeSpan(LifeSpan);
+	Super::Die();
+}
+
+void AAuraEnemy::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed; 
+}
+
 void AAuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed; 
 	InitAbilityActorInfo();
+	UAuraAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 
 	if (UAuraUserWidget* AuraUserWidget = Cast<UAuraUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -72,6 +88,14 @@ void AAuraEnemy::BeginPlay()
 				OnMaxHealthChanged.Broadcast(Data.NewValue);
 			}
 		);
+
+		// 为受击标签注册事件
+		AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Effects_HitReact,
+		                                                 EGameplayTagEventType::NewOrRemoved)
+		                      .AddUObject(
+			                      this,
+			                      &AAuraEnemy::HitReactTagChanged
+		                      );
 
 		// TODO:交给服务器初始化，同步Health和MaxHealth（客户端会设置为0，需要解决网络同步问题）
 		if (HasAuthority()) 

@@ -45,4 +45,21 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults")
 	static void InitializeDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC);
+
+	/**
+	 * 初始化角色能力
+	 * @param WorldContextObject 一个世界中已经存在的物体，是一个UObject的常量指针
+	 * @param ASC 能力系统组件
+	 */
+	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults")
+	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
+
+	/**
+	 * 初始化角色能力
+	 * @param WorldContextObject 一个世界中已经存在的物体，是一个UObject的常量指针
+	 * @return 角色类信息
+	 */
+	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults")
+	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContextObject);
+	
 };

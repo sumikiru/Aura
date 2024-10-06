@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+class UDamageTextComponent;
 class USplineComponent;
 class UAuraAbilitySystemComponent;
 class UAuraInputConfig;
@@ -26,6 +27,9 @@ class AURA_API AAuraPlayerController : public APlayerController
 public:
 	AAuraPlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
+
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter);
 
 protected:
 	virtual void BeginPlay() override;
@@ -87,4 +91,7 @@ private:
 	FTimerHandle UpdatePathPointsTimerHandle;
 	/*更新频率越高，则路线更加精确，但是开销更大*/
 	float UpdatePathPointsTimeRate = 0.2f;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
 };
