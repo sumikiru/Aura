@@ -60,7 +60,10 @@ void AAuraProjectile::Destroyed()
 			ImpactEffect,
 			GetActorLocation());
 		
-		LoopingSoundComponent->Stop();
+		if (LoopingSoundComponent)
+		{
+			LoopingSoundComponent->Stop();
+		}
 	}
 	Super::Destroyed();
 }
@@ -69,6 +72,13 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
                                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                            const FHitResult& SweepResult)
 {
+	if (DamageEffectSpecHandle.Data.IsValid() &&
+		DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
+	{
+		return;
+	}
+
+	
 	UGameplayStatics::PlaySoundAtLocation(
 		this,
 		ImpactSound,
@@ -79,7 +89,10 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 		this,
 		ImpactEffect,
 		GetActorLocation());
-	LoopingSoundComponent->Stop();
+	if (LoopingSoundComponent)
+	{
+		LoopingSoundComponent->Stop();
+	}
 	
 	if (HasAuthority())
 	{

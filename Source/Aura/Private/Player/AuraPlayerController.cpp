@@ -30,15 +30,16 @@ void AAuraPlayerController::PlayerTick(float DeltaTime)
 	AutoRun();
 }
 
-void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter)
+void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit)
 {
-	if (IsValid(TargetCharacter) && DamageTextComponentClass)
+	// 需要加上IsLocalController()的判断条件，这样如果是本地客户端显示伤害数字，则服务器不会显示
+	if (IsValid(TargetCharacter) && DamageTextComponentClass && IsLocalController())
 	{
 		UDamageTextComponent* DamageText = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextComponentClass);
-		DamageText->RegisterComponent(); // 动态创建组件，而不是在构造函数中CreateDefaultSubobject
+		DamageText->RegisterComponent(); // 动态创建组件，而不是在构造函数中CreateDefaultSubObject
 		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);// 动态绑定组件，相当于SetupAttachment
 		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform); // 分离开是为了播放动画时伤害数字不会跟随TargetCharacter移动
-		DamageText->SetDamageText(DamageAmount);
+		DamageText->SetDamageText(DamageAmount, bBlockedHit, bCriticalHit);
 	}
 }
 
