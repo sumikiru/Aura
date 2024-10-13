@@ -77,23 +77,26 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 	{
 		return;
 	}
-
-	
-	UGameplayStatics::PlaySoundAtLocation(
+	// 如果bHit曾经被设置为true，则不再播放
+	if (!bHit)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
 		this,
 		ImpactSound,
 		GetActorLocation(),
 		FRotator::ZeroRotator);
 
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-		this,
-		ImpactEffect,
-		GetActorLocation());
-	if (LoopingSoundComponent)
-	{
-		LoopingSoundComponent->Stop();
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			this,
+			ImpactEffect,
+			GetActorLocation());
+		if (LoopingSoundComponent)
+		{
+			LoopingSoundComponent->Stop();
+		}
 	}
-	
+
+	//服务器进行处理
 	if (HasAuthority())
 	{
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
@@ -105,6 +108,7 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 	}
 	else
 	{
+		// 不在服务器上
 		bHit = true;
 	}
 }
