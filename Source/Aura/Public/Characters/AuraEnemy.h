@@ -9,6 +9,9 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "AuraEnemy.generated.h"
 
+class AAuraAIController;
+class UBehaviorTree;
+class UBlackboardComponent;
 class UWidgetComponent;
 /**
  * 
@@ -20,6 +23,7 @@ class AURA_API AAuraEnemy : public AAuraCharacterBase, public IEnemyInterface
 
 public:
 	AAuraEnemy();
+	virtual void PossessedBy(AController* NewController) override;
 
 	//~ Begin EnemyInterface
 	virtual void HighlightActor() override;
@@ -59,4 +63,16 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+
+	UPROPERTY()
+	FName BB_HitReactingKey = TEXT("HitReacting");
+	UPROPERTY()
+	FName BB_RangedAttackerKey = TEXT("RangedAttacker");
+
+	/**记得还要在BP_EnemyBase中设置Pawn->AI控制器类为BP_AuraAIController*/
+	UPROPERTY()
+	TObjectPtr<AAuraAIController> AuraAIController; 
 };

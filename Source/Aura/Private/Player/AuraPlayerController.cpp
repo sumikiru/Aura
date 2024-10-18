@@ -90,8 +90,11 @@ void AAuraPlayerController::UpdatePathPoints()
 			DrawDebugSphere(GetWorld(), CachedDestination, 10.f, 10, FColor::Red, false, 5.f);
 		}
 		// 有时候CachedDestination = Hit.ImpactPoint;会使得该CachedDestination在NavPath之外，因此需要更新至NavPath的最后一个点，从而确保AutoRun()中角色能在到达边界后停下
-		CachedDestination = NavPath->PathPoints.Last();
-		bAutoRunning = true;
+		if (NavPath->PathPoints.Num() > 0) //防止数组越界
+		{
+			CachedDestination = NavPath->PathPoints.Last();
+			bAutoRunning = true;
+		}
 	}
 }
 
