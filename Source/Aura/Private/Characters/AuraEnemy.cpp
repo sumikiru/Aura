@@ -81,21 +81,39 @@ void AAuraEnemy::Die()
 	Super::Die();
 }
 
+void AAuraEnemy::SetCombatTarget_Implementation(AActor* InCombatTarget)
+{
+	CombatTarget = InCombatTarget;
+}
+
+AActor* AAuraEnemy::GetCombatTarget_Implementation()
+{
+	return CombatTarget;
+}
+
 void AAuraEnemy::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	bHitReacting = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
-	AuraAIController->GetBlackboardComponent()->SetValueAsBool(BB_HitReactingKey, bHitReacting);
+	// AuraAIController只在服务端上有效，所以客户端上敌人受击以后会出现UE崩溃。所以需要if检查，只在服务器设置值
+	if (AuraAIController && AuraAIController->GetBlackboardComponent())
+	{
+		AuraAIController->GetBlackboardComponent()->SetValueAsBool(BB_HitReactingKey, bHitReacting);
+	}
 }
 
 void AAuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed; 
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+	// 可选：四处移动而又不至于互相卡住，但效果较差。
+	// GetCharacterMovement()->bUseRVOAvoidance = true;
+	// GetCharacterMovement()->bOrientRotationToMovement = true;
+	
 	InitAbilityActorInfo();
 	if (HasAuthority())
 	{
-		UAuraAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+		UAuraAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
 	}
 
 	if (UAuraUserWidget* AuraUserWidget = Cast<UAuraUserWidget>(HealthBar->GetUserWidgetObject()))
@@ -108,14 +126,14 @@ void AAuraEnemy::BeginPlay()
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAS->GetHealthAttribute()).AddLambda(
 			[this](const FOnAttributeChangeData& Data)
 			{
-				OnHealthChanged.Broadcast(Data.NewValue); // 属性改变时广播
+				OnEnemyHealthChanged.Broadcast(Data.NewValue); // 属性改变时广播
 			}
 		);
 
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAS->GetMaxHealthAttribute()).AddLambda(
 			[this](const FOnAttributeChangeData& Data)
 			{
-				OnMaxHealthChanged.Broadcast(Data.NewValue);
+				OnEnemyMaxHealthChanged.Broadcast(Data.NewValue);
 			}
 		);
 
@@ -127,13 +145,13 @@ void AAuraEnemy::BeginPlay()
 			                      &AAuraEnemy::HitReactTagChanged
 		                      );
 
-		// TODO:交给服务器初始化，同步Health和MaxHealth（客户端会设置为0，需要解决网络同步问题）
-		if (HasAuthority()) 
+		// 交给服务器初始化，同步Health和MaxHealth（客户端会设置为0，需要解决网络同步问题）
+		if (HasAuthority())
 		{
 			// BeginPlay初始化时广播，用于初始化ProgressBarFront的百分比
-			OnHealthChanged.Broadcast(AuraAS->GetHealth());
+			OnEnemyHealthChanged.Broadcast(AuraAS->GetHealth());
 			GEngine->AddOnScreenDebugMessage(1, 100.0f, FColor::Red, FString::Printf(TEXT("Health: %f"), AuraAS->GetHealth()));
-			OnHealthChanged.Broadcast(AuraAS->GetMaxHealth());
+			OnEnemyMaxHealthChanged.Broadcast(AuraAS->GetMaxHealth());
 			GEngine->AddOnScreenDebugMessage(2, 100.0f, FColor::Red, FString::Printf(TEXT("MaxHealth: %f"), AuraAS->GetMaxHealth()));
 		}
 	}

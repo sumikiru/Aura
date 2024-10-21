@@ -33,21 +33,30 @@ public:
 	//~ Begin CombatInterface
 	virtual int32 GetPlayerLevel() override;
 	virtual void Die() override;
+	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
+	virtual AActor* GetCombatTarget_Implementation() override;
 	//~ End CombatInterface
 
+	/**
+	 * !!!注意：这里委托的名字不能使用OnHealthChanged和OnMaxHealthChanged！！！
+	 * 由于AuraEnemy.h包含了头文件OverlayWidgetController.h，而其中重名的OnHealthChanged和OnMaxHealthChanged会导致BeginPlay中设置的BroadCast出现异常
+	 * 使得变更后的值无法被正确地广播出去，从而让蓝图UI中显示的Health和MaxHealth的值在初始化阶段始终等于设定的默认值
+	 */
 	UPROPERTY(BlueprintAssignable) 
-	FOnAttributeChangedSignature OnHealthChanged;
+	FOnAttributeChangedSignature OnEnemyHealthChanged;
 	UPROPERTY(BlueprintAssignable)
-	FOnAttributeChangedSignature OnMaxHealthChanged;
+	FOnAttributeChangedSignature OnEnemyMaxHealthChanged;
 
 	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	bool bHitReacting = false;
-	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float BaseWalkSpeed = 250.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float LifeSpan = 5.f;
+	UPROPERTY(BlueprintReadWrite, Category = "Combat")
+	TObjectPtr<AActor> CombatTarget;
 
 protected:
 	virtual void BeginPlay() override;

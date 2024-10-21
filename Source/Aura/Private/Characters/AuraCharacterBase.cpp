@@ -4,6 +4,7 @@
 #include "Aura/Public/Characters/AuraCharacterBase.h"
 
 #include "AbilitySystemComponent.h"
+#include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Aura/Aura.h"
 #include "Components/CapsuleComponent.h"
@@ -55,6 +56,7 @@ void AAuraCharacterBase::MulticastHandleDeath_Implementation()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	Dissolve();
+	bDead = true;
 }
 
 void AAuraCharacterBase::BeginPlay()
@@ -67,10 +69,52 @@ void AAuraCharacterBase::InitAbilityActorInfo()
 {
 }
 
-FVector AAuraCharacterBase::GetCombatSocketLocation()
+FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
-	checkf(Weapon, TEXT("Weapon is not set"));
-	return Weapon->GetSocketLocation(WeaponTipSocketName);
+	// 不一定有武器：checkf(Weapon, TEXT("Weapon is not set"));
+	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
+	// 武器
+	if (IsValid(Weapon) && MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Weapon))
+	{
+		if (WeaponTipSocketName == NAME_None)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("WeaponTipSocketName is not set!"));
+		}
+		return Weapon->GetSocketLocation(WeaponTipSocketName);
+	}
+	// 非武器（如爪子）
+	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_LeftHand))
+	{
+		if (LeftHandSocketName == NAME_None)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("WeaponTipSocketName is not set!"));
+		}
+		return GetMesh()->GetSocketLocation(LeftHandSocketName);
+	}
+	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_RightHand))
+	{
+		if (RightHandSocketName == NAME_None)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("WeaponTipSocketName is not set!"));
+		}
+		return GetMesh()->GetSocketLocation(RightHandSocketName);
+	}
+	return FVector::ZeroVector;
+}
+
+bool AAuraCharacterBase::IsDead_Implementation() const
+{
+	return bDead;
+}
+
+AActor* AAuraCharacterBase::GetAvatar_Implementation()
+{
+	return this;
+}
+
+TArray<FTaggedMontage> AAuraCharacterBase::GetAttackMontages_Implementation()
+{
+	return AttackMontages;
 }
 
 void AAuraCharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameEffectClass, const float& Level) const

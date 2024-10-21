@@ -51,9 +51,10 @@ public:
 	 * 初始化角色能力
 	 * @param WorldContextObject 一个世界中已经存在的物体，是一个UObject的常量指针
 	 * @param ASC 能力系统组件
+	 * @param CharacterClass 角色类型，比如ECharacterClass::Elementalist
 	 */
 	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults")
-	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
+	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass);
 
 	/**
 	 * 初始化角色能力
@@ -74,4 +75,20 @@ public:
 	static void SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool bInIsBlockedHit);
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffect")
 	static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool bInIsCriticalHit);
+
+	/**
+	 * 获取特定半径内所有存活的角色
+	 * @param WorldContextObject 一个世界中已经存在的物体，是一个UObject的常量指针
+	 * @param OutOverlappingActors 用于存储特定半径内所有存活角色的数组
+	 * @param ActorsToIgnore 应该忽略的对象
+	 * @param Radius 特定半径
+	 * @param SphereOriginLocation 中心点位置。以该点为圆心，Radius为半径的圆内寻找存活角色
+	 */
+	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
+	static void GetLivePlayersWithinRadius(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors,
+	                                       const TArray<AActor*>& ActorsToIgnore, const float Radius,
+	                                       const FVector& SphereOriginLocation);
+	/** 判断攻击的角色是否为友军 */
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
+	static bool IsNotFriend(const AActor* FirstActor, const AActor* SecondActor);
 };
