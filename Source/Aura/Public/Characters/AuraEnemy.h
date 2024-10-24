@@ -79,6 +79,8 @@ protected:
 	UPROPERTY()
 	FName BB_HitReactingKey = TEXT("HitReacting");
 	UPROPERTY()
+	FName BB_DeadKey = TEXT("Dead");
+	UPROPERTY()
 	FName BB_RangedAttackerKey = TEXT("RangedAttacker");
 
 	/**记得还要在BP_EnemyBase中设置Pawn->AI控制器类为BP_AuraAIController*/
