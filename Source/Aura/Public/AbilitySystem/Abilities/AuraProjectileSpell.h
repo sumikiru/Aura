@@ -21,10 +21,13 @@ protected:
 
 	/**
 	 * 生成投掷物
-	 * @param ProjectileLocation 指的是攻击目标所在的位置，SocketLocation才是生成的位置
+	 * @param ProjectileTargetLocation 指的是攻击目标所在的位置，SocketLocation才是生成的位置
+	 * @param SocketTag 插槽的GameplayTag
+	 * @param bOverridePitch
+	 * @param PitchOverride
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Projectile")
-	void SpawnProjectile(const FVector& ProjectileLocation);
+	void SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch = false, float PitchOverride = 0.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<AAuraProjectile> ProjectileClass;

@@ -19,7 +19,7 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	
 }
 
-void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileLocation)
+void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch, float PitchOverride)
 {
 	/*True if this is the server or single player*/
 	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
@@ -33,8 +33,12 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileLocation)
 	// 以该方式调用，不需要再进行ICombatInterface的Cast结果检查
 	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(
 		GetAvatarActorFromActorInfo(),
-		FAuraGameplayTags::Get().Montage_Attack_Weapon);
-	FRotator Rotation = (ProjectileLocation - SocketLocation).Rotation();
+		SocketTag /*旧为FAuraGameplayTags::Get().CombatSocket_Weapon*/);
+	FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+	if (bOverridePitch)
+	{
+		Rotation.Pitch = PitchOverride;
+	}
 
 	FTransform SpawnTransform;
 	SpawnTransform.SetLocation(SocketLocation);
@@ -57,7 +61,7 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileLocation)
 	Actors.Add(Projectile);
 	EffectContextHandle.AddActors(Actors);
 	FHitResult HitResult;
-	HitResult.Location = ProjectileLocation; // ProjectileTargetLocation
+	HitResult.Location = ProjectileTargetLocation; // ProjectileTargetLocation
 	EffectContextHandle.AddHitResult(HitResult);
 	
 	

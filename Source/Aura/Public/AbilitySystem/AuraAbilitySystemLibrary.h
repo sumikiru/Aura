@@ -92,3 +92,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
 	static bool IsNotFriend(const AActor* FirstActor, const AActor* SecondActor);
 };
+
+// TODO:使用C++实现ForLoop_WithDelay和ForEachLoop_WithDelay宏
+//#define Aura_ForLoop_WithDelay(i) \

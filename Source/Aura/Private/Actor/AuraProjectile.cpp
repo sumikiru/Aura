@@ -65,6 +65,7 @@ void AAuraProjectile::Destroyed()
 		{
 			LoopingSoundComponent->Stop();
 		}
+		bHit = true;
 	}
 	Super::Destroyed();
 }
@@ -100,6 +101,7 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 		{
 			LoopingSoundComponent->Stop();
 		}
+		bHit = true;
 	}
 
 	//服务器进行处理

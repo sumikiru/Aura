@@ -8,6 +8,7 @@
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Aura/Aura.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AAuraCharacterBase::AAuraCharacterBase()
 {
@@ -43,6 +44,13 @@ void AAuraCharacterBase::Die()
 
 void AAuraCharacterBase::MulticastHandleDeath_Implementation()
 {
+	UGameplayStatics::PlaySoundAtLocation(
+		this,
+		DeathSound,
+		GetActorLocation(),
+		GetActorRotation()
+	);
+	
 	//布娃娃效果
 	Weapon->SetSimulatePhysics(true);
 	Weapon->SetEnableGravity(true);
@@ -74,7 +82,7 @@ FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGamepl
 	// 不一定有武器：checkf(Weapon, TEXT("Weapon is not set"));
 	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
 	// 武器
-	if (IsValid(Weapon) && MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Weapon))
+	if (IsValid(Weapon) && MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon))
 	{
 		if (WeaponTipSocketName == NAME_None)
 		{
@@ -83,7 +91,7 @@ FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGamepl
 		return Weapon->GetSocketLocation(WeaponTipSocketName);
 	}
 	// 非武器（如爪子）
-	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_LeftHand))
+	if (MontageTag.MatchesTagExact(GameplayTags.CombatSocket_LeftHand))
 	{
 		if (LeftHandSocketName == NAME_None)
 		{
@@ -91,13 +99,21 @@ FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGamepl
 		}
 		return GetMesh()->GetSocketLocation(LeftHandSocketName);
 	}
-	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_RightHand))
+	if (MontageTag.MatchesTagExact(GameplayTags.CombatSocket_RightHand))
 	{
 		if (RightHandSocketName == NAME_None)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("WeaponTipSocketName is not set!"));
 		}
 		return GetMesh()->GetSocketLocation(RightHandSocketName);
+	}
+	if (MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Tail))
+	{
+		if (TailSocketName == NAME_None)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("TailSocketName is not set!"));
+		}
+		return GetMesh()->GetSocketLocation(TailSocketName);
 	}
 	return FVector::ZeroVector;
 }
@@ -115,6 +131,33 @@ AActor* AAuraCharacterBase::GetAvatar_Implementation()
 TArray<FTaggedMontage> AAuraCharacterBase::GetAttackMontages_Implementation()
 {
 	return AttackMontages;
+}
+
+UNiagaraSystem* AAuraCharacterBase::GetBloodEffect_Implementation()
+{
+	return BloodEffect;
+}
+
+FTaggedMontage AAuraCharacterBase::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
+{
+	for (const FTaggedMontage& TaggedMontage : AttackMontages)
+	{
+		if (TaggedMontage.MontageTag == MontageTag)
+		{
+			return TaggedMontage;
+		}
+	}
+	return FTaggedMontage();
+}
+
+int32 AAuraCharacterBase::GetMinionCount_Implementation()
+{
+	return MinionCount;
+}
+
+void AAuraCharacterBase::IncrementMinionCount_Implementation(int32 Amount)
+{
+	MinionCount = FMath::Max(0, MinionCount + Amount);
 }
 
 void AAuraCharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameEffectClass, const float& Level) const

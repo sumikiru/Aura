@@ -194,20 +194,48 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FName(TEXT("Abilities.Attack")),
 		FString(TEXT("Attack Ability Tag"))
 	);
+	GameplayTags.Abilities_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Abilities.Summon")),
+		FString(TEXT("Summon Ability Tag"))
+	);
 
 	/**
-	 * Montage
+	 * Combat Sockets
 	 */
-	GameplayTags.Montage_Attack_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName(TEXT("Montage.Attack.Weapon")),
+	GameplayTags.CombatSocket_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("CombatSocket.Weapon")),
 		FString(TEXT("Weapon"))
 	);
-	GameplayTags.Montage_Attack_LeftHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName(TEXT("Montage.Attack.LeftHand")),
+	GameplayTags.CombatSocket_LeftHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("CombatSocket.LeftHand")),
 		FString(TEXT("Left Hand"))
 	);
-	GameplayTags.Montage_Attack_RightHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName(TEXT("Montage.Attack.RightHand")),
+	GameplayTags.CombatSocket_RightHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("CombatSocket.RightHand")),
 		FString(TEXT("Right Hand"))
+	);
+	GameplayTags.CombatSocket_Tail = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("CombatSocket.Tail")),
+		FString(TEXT("Tail"))
+	);
+
+	/**
+	 * Montages
+	 */
+	GameplayTags.Montage_Attack_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Montage.Attack.1")),
+		FString(TEXT("Attack 1"))
+	);
+	GameplayTags.Montage_Attack_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Montage.Attack.2")),
+		FString(TEXT("Attack 2"))
+	);
+	GameplayTags.Montage_Attack_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Montage.Attack.3")),
+		FString(TEXT("Attack 3"))
+	);
+	GameplayTags.Montage_Attack_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Montage.Attack.4")),
+		FString(TEXT("Attack 4"))
 	);
 }
