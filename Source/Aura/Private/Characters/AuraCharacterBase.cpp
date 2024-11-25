@@ -39,7 +39,7 @@ void AAuraCharacterBase::Die()
 {
 	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 	
-	MulticastHandleDeath();
+	MulticastHandleDeath_Implementation();
 }
 
 void AAuraCharacterBase::MulticastHandleDeath_Implementation()
