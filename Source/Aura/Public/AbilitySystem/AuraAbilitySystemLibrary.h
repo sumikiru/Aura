@@ -91,6 +91,9 @@ public:
 	/** 判断攻击的角色是否为友军 */
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
 	static bool IsNotFriend(const AActor* FirstActor, const AActor* SecondActor);
+
+	static int32 GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 CharacterLevel);
+	
 };
 
 // TODO:使用C++实现ForLoop_WithDelay和ForEachLoop_WithDelay宏

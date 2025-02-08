@@ -21,7 +21,9 @@ struct FEffectProperties
 {
 	GENERATED_BODY()
 
-	FEffectProperties() {}	//注意！不是FEffectProperties();应该是默认构造函数
+	FEffectProperties()
+	{
+	} //注意！不是FEffectProperties();应该是默认构造函数
 
 	FGameplayEffectContextHandle EffectContextHandle;
 
@@ -33,7 +35,7 @@ struct FEffectProperties
 	AController* SourceController = nullptr;
 	UPROPERTY()
 	ACharacter* SourceCharacter = nullptr;
-	
+
 	UPROPERTY()
 	UAbilitySystemComponent* TargetASC = nullptr;
 	UPROPERTY()
@@ -81,11 +83,11 @@ public:
 	 */
 	//AttrFuncPtr FunctionPointer;
 	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
-	
+
 	/**
 	 * Primary Attributes
 	 */
-	
+
 	//力量
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Strength, Category = "Primary Attributes")
 	FGameplayAttributeData Strength;
@@ -106,7 +108,7 @@ public:
 	/**
 	 * Secondary Attributes
 	 */
-	
+
 	//护盾量
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Armor, Category = "Secondary Attributes")
 	FGameplayAttributeData Armor;
@@ -162,18 +164,18 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_ArcaneResistance, Category = "Resistance Attributes")
 	FGameplayAttributeData ArcaneResistance;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, ArcaneResistance);
-    	
+
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_PhysicalResistance, Category = "Resistance Attributes")
 	FGameplayAttributeData PhysicalResistance;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, PhysicalResistance);
-	
+
 	/**
 	 * Vital Attributes
 	 */
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Vital Attributes")
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Health);
-	
+
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana, Category = "Vital Attributes")
 	FGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Mana);
@@ -184,7 +186,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
 	FGameplayAttributeData IncomingDamage;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, IncomingDamage);
-	
+
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+	FGameplayAttributeData IncomingXP;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, IncomingXP);
+
 	UFUNCTION()
 	void OnRep_Strength(const FGameplayAttributeData& OldStrength) const;
 	UFUNCTION()
@@ -222,7 +228,7 @@ public:
 	void OnRep_ArcaneResistance(const FGameplayAttributeData& OldArcaneResistance) const;
 	UFUNCTION()
 	void OnRep_PhysicalResistance(const FGameplayAttributeData& OldPhysicalResistance) const;
-	
+
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
 	UFUNCTION()
@@ -231,4 +237,5 @@ public:
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
 	void ShowFloatingDamageText(const FEffectProperties& Props, float Damage, bool bBlockedHit, bool bCriticalHit) const;
+	void SendXPEvent(const FEffectProperties& Props);
 };

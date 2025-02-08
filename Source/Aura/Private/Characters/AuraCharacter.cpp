@@ -13,14 +13,16 @@
 AAuraCharacter::AAuraCharacter()
 {
 	//CharacterMovement在ABP事件蓝图初始化动画中创建
-	GetCharacterMovement()->bOrientRotationToMovement = true;//将旋转朝向运动
+	GetCharacterMovement()->bOrientRotationToMovement = true; //将旋转朝向运动
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 400.0f, 0.0f);
-	GetCharacterMovement()->bConstrainToPlane = true;//约束到平面
-	GetCharacterMovement()->bSnapToPlaneAtStart = true;//开始时与平面对齐
+	GetCharacterMovement()->bConstrainToPlane = true; //约束到平面
+	GetCharacterMovement()->bSnapToPlaneAtStart = true; //开始时与平面对齐
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+
+	CharacterClass = ECharacterClass::Elementalist;
 }
 
 void AAuraCharacter::PossessedBy(AController* NewController)
@@ -41,6 +43,14 @@ void AAuraCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+void AAuraCharacter::AddToXP_Implementation(int32 InXP)
+{
+	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+
+	AuraPlayerState->AddToXP(InXP);
+}
+
 int32 AAuraCharacter::GetPlayerLevel()
 {
 	const AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
@@ -51,7 +61,7 @@ int32 AAuraCharacter::GetPlayerLevel()
 void AAuraCharacter::InitAbilityActorInfo()
 {
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-	check(AuraPlayerState);//注意：World中只能有一个AuraCharacter，有PlayerStart就行，不要有单独的BP_AuraPlayerCharacter（AuraPlayerState为空）出现在World
+	check(AuraPlayerState); //注意：World中只能有一个AuraCharacter，有PlayerStart就行，不要有单独的BP_AuraPlayerCharacter（AuraPlayerState为空）出现在World
 	AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState, this);
 	Cast<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
@@ -60,7 +70,7 @@ void AAuraCharacter::InitAbilityActorInfo()
 	//不应check(AuraPlayerController);仅在本地的客户端中不为空(仅对本地控制有效)
 	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
 	{
-		if(AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD()))
+		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD()))
 		{
 			AuraHUD->InitOverlay(AuraPlayerController, AuraPlayerState, AbilitySystemComponent, AttributeSet);
 		}

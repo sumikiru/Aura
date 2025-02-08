@@ -15,10 +15,10 @@ AAuraCharacterBase::AAuraCharacterBase()
 	PrimaryActorTick.bCanEverTick = false;
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-	GetCapsuleComponent()->SetGenerateOverlapEvents(false);// 只需要有一个组件生成重叠事件，否则例如火焰效果会触发多次
+	GetCapsuleComponent()->SetGenerateOverlapEvents(false); // 只需要有一个组件生成重叠事件，否则例如火焰效果会触发多次
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
-	GetMesh()->SetGenerateOverlapEvents(true);// 生成重叠事件，针对ECR_Overlap
+	GetMesh()->SetGenerateOverlapEvents(true); // 生成重叠事件，针对ECR_Overlap
 
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
@@ -38,7 +38,7 @@ UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation()
 void AAuraCharacterBase::Die()
 {
 	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
-	
+
 	MulticastHandleDeath_Implementation();
 }
 
@@ -50,7 +50,7 @@ void AAuraCharacterBase::MulticastHandleDeath_Implementation()
 		GetActorLocation(),
 		GetActorRotation()
 	);
-	
+
 	//布娃娃效果
 	Weapon->SetSimulatePhysics(true);
 	Weapon->SetEnableGravity(true);
@@ -60,7 +60,7 @@ void AAuraCharacterBase::MulticastHandleDeath_Implementation()
 	GetMesh()->SetEnableGravity(true);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	
+
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	Dissolve();
@@ -70,7 +70,6 @@ void AAuraCharacterBase::MulticastHandleDeath_Implementation()
 void AAuraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void AAuraCharacterBase::InitAbilityActorInfo()
@@ -160,12 +159,17 @@ void AAuraCharacterBase::IncrementMinionCount_Implementation(int32 Amount)
 	MinionCount = FMath::Max(0, MinionCount + Amount);
 }
 
+ECharacterClass AAuraCharacterBase::GetCharacterClass_Implementation()
+{
+	return CharacterClass;
+}
+
 void AAuraCharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameEffectClass, const float& Level) const
 {
 	check(IsValid(GetAbilitySystemComponent()));
 	check(GameEffectClass);
 	FGameplayEffectContextHandle EffectContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
-	EffectContextHandle.AddSourceObject(this);//注意加上
+	EffectContextHandle.AddSourceObject(this); //注意加上
 	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameEffectClass, Level, EffectContextHandle);
 
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
@@ -186,6 +190,7 @@ void AAuraCharacterBase::AddCharacterAbilities()
 	}
 	UAuraAbilitySystemComponent* AuraASC = CastChecked<UAuraAbilitySystemComponent>(AbilitySystemComponent);
 	AuraASC->AddCharacterAbilities(StartupAbilities);
+	AuraASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
 }
 
 void AAuraCharacterBase::Dissolve()
