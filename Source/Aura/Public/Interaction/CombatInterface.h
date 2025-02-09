@@ -40,8 +40,9 @@ class AURA_API ICombatInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	//不应该为純虚函数，AuraCharacterBase并不重写
-	virtual int32 GetPlayerLevel();
+	// 去掉virtual关键字，因为BlueprintNativeEvent底层机制是：UHT默认实现virtual int32 GetPlayerLevel_Implementation();
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetPlayerLevel();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FVector GetCombatSocketLocation(const FGameplayTag& MontageTag);

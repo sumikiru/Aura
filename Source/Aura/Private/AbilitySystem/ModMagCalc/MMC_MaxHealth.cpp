@@ -31,9 +31,11 @@ float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffec
 
 	// 如果GetSourceObject()返回值为空，说明GetContext()没有获取到SourceObject
 	// 需要在AAuraCharacterBase::ApplyEffectToSelf中加入EffectContextHandle.AddSourceObject(this);
-	ICombatInterface* CombatInterface = Cast<ICombatInterface>(Spec.GetContext().GetSourceObject());
-	checkf(CombatInterface, TEXT("请检查AAuraCharacterBase::ApplyEffectToSelf中是否加入EffectContextHandle.AddSourceObject(this);"));
-	const int32 PlayerLevel = CombatInterface->GetPlayerLevel();
+	int32 PlayerLevel = 1;
+	if (Spec.GetContext().GetSourceObject()->Implements<UCombatInterface>())
+	{
+		PlayerLevel = ICombatInterface::Execute_GetPlayerLevel(Spec.GetContext().GetSourceObject());
+	}
 	
 	return 80.f + 2.f * Vigor + 10.f * PlayerLevel;
 }

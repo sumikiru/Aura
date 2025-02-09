@@ -191,9 +191,9 @@ void UAuraAttributeSet::SendXPEvent(const FEffectProperties& Props)
 	 * 1.ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetCharacter)
 	 * 2.Props.TargetCharacter->Implements<UCombatInterface>()
 	 */
-	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetCharacter))
+	if (Props.TargetCharacter->Implements<UCombatInterface>())
 	{
-		const int32 TargetLevel = CombatInterface->GetPlayerLevel();
+		const int32 TargetLevel = ICombatInterface::Execute_GetPlayerLevel(Props.TargetCharacter);
 		const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClass(Props.TargetCharacter); // 安全获取结果（无论 UObject 是 C++ 还是蓝图）
 		const int32 XPReward = UAuraAbilitySystemLibrary::GetXPRewardForClassAndLevel(Props.TargetCharacter, TargetClass, TargetLevel);
 
