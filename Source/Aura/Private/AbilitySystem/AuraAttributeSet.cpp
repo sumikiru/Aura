@@ -5,7 +5,6 @@
 #include "GameplayEffectExtension.h"
 #include "AbilitySystemComponent.h"
 #include "AuraGameplayTags.h"
-#include "AuraLogChannels.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
@@ -103,7 +102,8 @@ void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
 
 /**
  * 在修改属性值后，此函数可立即对更改做出响应。 \n
- * 这通常包括限制属性的最终值或触发对新值的游戏内响应，例如当"生命值"属性降至零时死亡。
+ * 这通常包括限制属性的最终值或触发对新值的游戏内响应，例如当"生命值"属性降至零时死亡。 \n
+ * 主要用于处理GE产生的效果，并非用于修改Attribute
  */
 void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
@@ -158,7 +158,6 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		const float LocalIncomingXP = GetIncomingXP();
 		SetIncomingXP(0.f); //重置为0
 
-		//todo: See if we should level up
 		// SourceCharacter is the owner, since GA_ListenForEvents applies GE_EventBasedEffect, adding to IncomingXP
 		if (Props.SourceCharacter->Implements<UPlayerInterface>() && Props.SourceCharacter->Implements<UCombatInterface>())
 		{
@@ -169,7 +168,6 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			const int32 NumLevelUps = NewLevel - CurrentLevel;
 			if (NumLevelUps > 0)
 			{
-				//todo:
 				int32 AttributePointsReward = IPlayerInterface::Execute_GetAttributePointsReward(Props.SourceCharacter, CurrentLevel);
 				int32 SpellPointsReward = IPlayerInterface::Execute_GetSpellPointsReward(Props.SourceCharacter, CurrentLevel);
 
@@ -178,14 +176,33 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				IPlayerInterface::Execute_AddToSpellPoints(Props.SourceCharacter, SpellPointsReward);
 
 				// Fill up Health and Mana
-				SetHealth(GetMaxHealth());
-				SetMana(GetMaxMana());
+				bTopOffHealth = true;
+				bTopOffMana = true;
 
 				IPlayerInterface::Execute_LevelUp(Props.SourceCharacter);
 			}
 
 			IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
 		}
+	}
+}
+
+/**
+ * 每次Attribute实际变化时触发（可能多次）
+ */
+void UAuraAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+
+	if (Attribute == GetMaxHealthAttribute() && bTopOffHealth)
+	{
+		SetHealth(GetMaxHealth());
+		bTopOffHealth = false;
+	}
+	if (Attribute == GetMaxManaAttribute() && bTopOffMana)
+	{
+		SetMana(GetMaxMana());
+		bTopOffMana = false;
 	}
 }
 

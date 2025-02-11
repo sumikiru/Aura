@@ -70,6 +70,7 @@ public:
 	//主要为了FMath::Clamp设计的
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 
 	/*本质上是FGameplayAttribute(*)()*/
 	//using AttrFuncPtr = TBaseStaticDelegateInstance<FGameplayAttribute(), FDefaultDelegateUserPolicy>::FFuncPtr;
@@ -238,4 +239,7 @@ private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
 	void ShowFloatingDamageText(const FEffectProperties& Props, float Damage, bool bBlockedHit, bool bCriticalHit) const;
 	void SendXPEvent(const FEffectProperties& Props);
+	/* 升级时变为true。用于确认最大值是否待改变 */
+	bool bTopOffHealth = false;
+	bool bTopOffMana = false;
 };

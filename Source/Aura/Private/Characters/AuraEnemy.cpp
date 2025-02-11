@@ -154,9 +154,7 @@ void AAuraEnemy::BeginPlay()
 		{
 			// BeginPlay初始化时广播，用于初始化ProgressBarFront的百分比
 			OnEnemyHealthChanged.Broadcast(AuraAS->GetHealth());
-			GEngine->AddOnScreenDebugMessage(1, 100.0f, FColor::Red, FString::Printf(TEXT("Health: %f"), AuraAS->GetHealth()));
 			OnEnemyMaxHealthChanged.Broadcast(AuraAS->GetMaxHealth());
-			GEngine->AddOnScreenDebugMessage(2, 100.0f, FColor::Red, FString::Printf(TEXT("MaxHealth: %f"), AuraAS->GetMaxHealth()));
 		}
 	}
 	
