@@ -120,6 +120,16 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FString(TEXT("Input Tag for 4 key"))
 	);
 
+	GameplayTags.InputTag_Passive_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("InputTag.Passive.1")),
+		FString(TEXT("Input Tag for Passive Ability 1, just for AnilityInfo, not for input"))
+	);
+
+	GameplayTags.InputTag_Passive_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("InputTag.Passive.2")),
+		FString(TEXT("Input Tag for Passive Ability 2, just for AnilityInfo, not for input"))
+	);
+
 	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName(TEXT("Damage")),
 		FString(TEXT("Damage"))
@@ -206,13 +216,62 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FName(TEXT("Abilities.Summon")),
 		FString(TEXT("Summon Ability Tag"))
 	);
+
+	GameplayTags.Abilities_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Abilities.HitReact")),
+		FString(TEXT("Hit React Ability"))
+	);
+
+	/**
+	 * Ability Status
+	 */
+	GameplayTags.Abilities_Status_Locked = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Abilities.Status.Locked")),
+		FString(TEXT("Locked Status"))
+	);
+	GameplayTags.Abilities_Status_Eligible = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Abilities.Status.Eligible")),
+		FString(TEXT("Eligible Status"))
+	);
+	GameplayTags.Abilities_Status_Unlocked = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Abilities.Status.Unlocked")),
+		FString(TEXT("Unlocked Status"))
+	);
+	GameplayTags.Abilities_Status_Equipped = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Abilities.Status.Equipped")),
+		FString(TEXT("Equipped Status"))
+	);
+
+	/**
+	 * Ability Type
+	 */
+	GameplayTags.Abilities_Type_Offensive = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Abilities.Type.Offensive")),
+		FString(TEXT("Type Offensive"))
+	);
+	GameplayTags.Abilities_Type_Passive = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Abilities.Type.Passive")),
+		FString(TEXT("Type Passive"))
+	);
+	GameplayTags.Abilities_Type_None = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Abilities.Type.None")),
+		FString(TEXT("Type None"))
+	);
+
+	/**
+	 * Abilities
+	 */
 	GameplayTags.Abilities_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName(TEXT("Abilities.Fire.FireBolt")),
 		FString(TEXT("FireBolt Ability Tag"))
 	);
+	GameplayTags.Abilities_Lightning_Electrocute = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Abilities.Lightning.Electrocute")),
+		FString(TEXT("Electrocute Ability Tag"))
+	);
 
 	/**
-	 * Cooldowns
+	 * Cooldown
 	 */
 	GameplayTags.Cooldown_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName(TEXT("Cooldown.Fire.FireBolt")),
@@ -220,7 +279,7 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	);
 
 	/**
-	 * Combat Sockets
+	 * Combat Socket
 	 */
 	GameplayTags.CombatSocket_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName(TEXT("CombatSocket.Weapon")),
