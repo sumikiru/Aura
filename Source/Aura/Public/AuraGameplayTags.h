@@ -57,6 +57,7 @@ struct FAuraGameplayTags
 	FGameplayTag Damage_Arcane;
 	FGameplayTag Damage_Physical;
 
+	FGameplayTag Abilities_None;
 	FGameplayTag Abilities_Attack;
 	FGameplayTag Abilities_Summon;
 
