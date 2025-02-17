@@ -79,6 +79,11 @@ void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityT
 
 	SelectedAbility.Ability = AbilityTag;
 	SelectedAbility.Status = AbilityStatus;
+	// 决定按钮是否启用（根据SpellPoints和Status判定），每当点击SpellGlobe_Button时均需要进行判断
+	bool bEnableSpellPoints = false;
+	bool bEnableEquip = false;
+	ShouldEnableButtons(SelectedAbility.Status, CurrentSpellPoints, bEnableSpellPoints, bEnableEquip);
+	SpellGlobeSelectedDelegate.Broadcast(bEnableSpellPoints, bEnableEquip);
 }
 
 void USpellMenuWidgetController::ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SpellPoints, bool& bShouldEnableSpellPointsButton,
