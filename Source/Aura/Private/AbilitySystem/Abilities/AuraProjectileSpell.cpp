@@ -15,11 +15,10 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
                                            const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-	
-	
 }
 
-void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch, float PitchOverride)
+void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch,
+                                           float PitchOverride)
 {
 	/*True if this is the server or single player*/
 	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
@@ -27,7 +26,7 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 	{
 		return;
 	}
-	
+
 	// 因为GetCombatSocketLocation改为了在蓝图中编译生成函数
 	// 所以不要在接口中直接调用Event函数（CombatInterface->GetCombatSocketLocation()），而是调用Execute_GetCombatSocketLocation
 	// 以该方式调用，不需要再进行ICombatInterface的Cast结果检查
@@ -63,13 +62,13 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 	FHitResult HitResult;
 	HitResult.Location = ProjectileTargetLocation; // ProjectileTargetLocation
 	EffectContextHandle.AddHitResult(HitResult);
-	
-	
+
+
 	const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
 
 	const FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
 
-	for (TTuple<FGameplayTag, FScalableFloat>& Pair: DamageTypes)
+	for (TTuple<FGameplayTag, FScalableFloat>& Pair : DamageTypes)
 	{
 		const float ScaledDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
 		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
