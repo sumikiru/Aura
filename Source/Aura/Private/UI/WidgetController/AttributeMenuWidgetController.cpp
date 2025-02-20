@@ -44,6 +44,14 @@ void UAttributeMenuWidgetController::BroadcastInitialValues()
 	AttributePointsChangedDelegate.Broadcast(GetAuraPS()->GetAttributePoints());
 }
 
+void UAttributeMenuWidgetController::UnbindingAllDelegates()
+{
+	Super::UnbindingAllDelegates();
+
+	AttributeInfoDelegate.Clear();
+	AttributePointsChangedDelegate.Clear();
+}
+
 void UAttributeMenuWidgetController::UpgradeAttribute(const FGameplayTag& AttributeTag)
 {
 	UAuraAbilitySystemComponent* AuraASC = CastChecked<UAuraAbilitySystemComponent>(AbilitySystemComponent);

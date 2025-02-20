@@ -25,6 +25,12 @@ void UAuraWidgetController::BindCallbacksToDependencies()
 {
 }
 
+void UAuraWidgetController::UnbindingAllDelegates()
+{
+	//Unbind Delegate: 1.防止内存泄漏；2.避免无效调用；3.防止重复绑定
+	AbilityInfoDelegate.Clear();
+}
+
 void UAuraWidgetController::BroadcastAbilityInfo()
 {
 	if (!GetAuraASC()->bStartupAbilitiesGiven)

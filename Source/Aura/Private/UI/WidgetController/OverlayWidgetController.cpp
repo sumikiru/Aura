@@ -3,6 +3,7 @@
 
 #include "UI/WidgetController/OverlayWidgetController.h"
 
+#include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
@@ -54,6 +55,9 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 
 	if (GetAuraASC())
 	{
+		// 绑定：SpellMenu中装备好Ability后，更新Overlay中的能力Slot显示
+		GetAuraASC()->AbilityEquippedDelegate.AddUObject(this, &UOverlayWidgetController::OnAbilityEquipped);
+
 		// 已经赋予过能力
 		if (GetAuraASC()->bStartupAbilitiesGiven)
 		{
@@ -84,6 +88,19 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	}
 }
 
+void UOverlayWidgetController::UnbindingAllDelegates()
+{
+	Super::UnbindingAllDelegates();
+
+	OnHealthChanged.Clear();
+	OnMaxHealthChanged.Clear();
+	OnManaChanged.Clear();
+	OnMaxManaChanged.Clear();
+	MessageWidgetRowDelegate.Clear();
+	OnXPPercentChangedDelegate.Clear();
+	OnPlayerLevelChangedDelegate.Clear();
+}
+
 void UOverlayWidgetController::OnXPChanged(int32 NewXP)
 {
 	const ULevelUpInfo* LevelUpInfo = GetAuraPS()->LevelUpInfo;
@@ -104,4 +121,23 @@ void UOverlayWidgetController::OnXPChanged(int32 NewXP)
 
 		OnXPPercentChangedDelegate.Broadcast(XPBarPercent);
 	}
+}
+
+void UOverlayWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot,
+                                                 const FGameplayTag& PreviousSlot) const
+{
+	// 1.Clear Last Equipped Ability
+	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
+	FAuraAbilityInfo LastSlotInfo;
+	LastSlotInfo.StatusTag = GameplayTags.Abilities_Status_Unlocked;
+	LastSlotInfo.InputTag = PreviousSlot;
+	LastSlotInfo.AbilityTag = GameplayTags.Abilities_None;
+	// Broadcast empty info if PreviousSlot is a valid slot only if equipping an already-equipped spell
+	AbilityInfoDelegate.Broadcast(LastSlotInfo);
+
+	// 2.Fill in new info
+	FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
+	Info.StatusTag = Status;
+	Info.InputTag = Slot;
+	AbilityInfoDelegate.Broadcast(Info);
 }
