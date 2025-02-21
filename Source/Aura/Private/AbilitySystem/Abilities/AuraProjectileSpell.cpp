@@ -34,6 +34,9 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 		GetAvatarActorFromActorInfo(),
 		SocketTag /*旧为FAuraGameplayTags::Get().CombatSocket_Weapon*/);
 	FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+	DrawDebugPoint(GetWorld(), SocketLocation, 10.0f, FColor::Red, false, 100.f);
+	DrawDebugPoint(GetWorld(), ProjectileTargetLocation, 10.0f, FColor::Red, false, 100.f);
+	DrawDebugLine(GetWorld(), SocketLocation, ProjectileTargetLocation, FColor::Green, false, 100.f);
 	if (bOverridePitch)
 	{
 		Rotation.Pitch = PitchOverride;
@@ -68,11 +71,8 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 
 	const FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
 
-	for (TTuple<FGameplayTag, FScalableFloat>& Pair : DamageTypes)
-	{
-		const float ScaledDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
-	}
+	const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, DamageType, ScaledDamage);
 	Projectile->DamageEffectSpecHandle = SpecHandle;
 
 	Projectile->FinishSpawning(SpawnTransform);
