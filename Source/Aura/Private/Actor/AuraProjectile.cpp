@@ -44,28 +44,33 @@ void AAuraProjectile::BeginPlay()
 	
 }
 
+void AAuraProjectile::OnHit()
+{
+	UGameplayStatics::PlaySoundAtLocation(
+		this,
+		ImpactSound,
+		GetActorLocation(),
+		FRotator::ZeroRotator);
+
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		this,
+		ImpactEffect,
+		GetActorLocation());
+		
+	if (LoopingSoundComponent)
+	{
+		LoopingSoundComponent->Stop();
+	}
+	bHit = true;
+}
+
 void AAuraProjectile::Destroyed()
 {
 	// 如果还未被击中（击中前）且不在服务器上（客户端）
 	// 之所以使用bHit，是因为仅仅根据HasAuthority()判断，可能导致在OnSphereBeginOverlap之前执行Destroy()
 	if (!bHit && !HasAuthority())
 	{
-		UGameplayStatics::PlaySoundAtLocation(
-		this,
-		ImpactSound,
-		GetActorLocation(),
-		FRotator::ZeroRotator);
-
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			this,
-			ImpactEffect,
-			GetActorLocation());
-		
-		if (LoopingSoundComponent)
-		{
-			LoopingSoundComponent->Stop();
-		}
-		bHit = true;
+		OnHit();
 	}
 	Super::Destroyed();
 }
@@ -74,34 +79,20 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
                                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                            const FHitResult& SweepResult)
 {
-	if (!DamageEffectSpecHandle.Data.IsValid() ||
-		DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
+	const AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	if (SourceAvatarActor == OtherActor)
 	{
 		return;
 	}
 	// 为友军，忽略
-	if (!UAuraAbilitySystemLibrary::IsNotFriend(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor))
+	if (!UAuraAbilitySystemLibrary::IsNotFriend(SourceAvatarActor, OtherActor))
 	{
 		return;
 	}
 	// 如果bHit曾经被设置为true，则不再播放
 	if (!bHit)
 	{
-		UGameplayStatics::PlaySoundAtLocation(
-		this,
-		ImpactSound,
-		GetActorLocation(),
-		FRotator::ZeroRotator);
-
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			this,
-			ImpactEffect,
-			GetActorLocation());
-		if (LoopingSoundComponent)
-		{
-			LoopingSoundComponent->Stop();
-		}
-		bHit = true;
+		OnHit();
 	}
 
 	//服务器进行处理
@@ -109,7 +100,8 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 	{
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
-			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+			DamageEffectParams.TargetAbilitySystemComponent = TargetASC;
+			UAuraAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 		}
 		
 		Destroy();//其会自动调用Destroyed()
