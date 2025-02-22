@@ -15,8 +15,8 @@ UCLASS()
 class AURA_API AAuraProjectile : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	AAuraProjectile();
 
 	UPROPERTY(VisibleAnywhere)
@@ -33,15 +33,16 @@ protected:
 	 */
 	virtual void Destroyed() override;
 	UFUNCTION()
-	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	                          bool bFromSweep, const FHitResult& SweepResult);
 
 private:
 	// 寿命，如果一直未发生碰撞，则定时摧毁
 	UPROPERTY(EditDefaultsOnly)
 	float LifeSpan = 10.f;
-	
+
 	bool bHit = false;
-	
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> SphereComponent;
 

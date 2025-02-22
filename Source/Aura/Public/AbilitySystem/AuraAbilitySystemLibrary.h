@@ -7,6 +7,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "AuraAbilitySystemLibrary.generated.h"
 
+struct FGameplayTag;
 struct FDamageEffectParams;
 class UAbilityInfo;
 class AAuraHUD;
@@ -102,6 +103,21 @@ public:
 	/** 是否造成暴击 */
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffect")
 	static bool IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle);
+	/** 是否成功添加Debuff */
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffect")
+	static bool IsSuccessfulDebuff(const FGameplayEffectContextHandle& EffectContextHandle);
+	/** 获取Debuff伤害值 */
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffect")
+	static float GetDebuffDamage(const FGameplayEffectContextHandle& EffectContextHandle);
+	/** 获取Debuff频率 */
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffect")
+	static float GetDebuffFrequency(const FGameplayEffectContextHandle& EffectContextHandle);
+	/** 获取Debuff持续时间 */
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffect")
+	static float GetDebuffDuration(const FGameplayEffectContextHandle& EffectContextHandle);
+	/** 获取伤害类型的GameplayTag */
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffect")
+	static FGameplayTag GetDamageType(const FGameplayEffectContextHandle& EffectContextHandle);
 
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffect")
 	static void SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool bInIsBlockedHit);

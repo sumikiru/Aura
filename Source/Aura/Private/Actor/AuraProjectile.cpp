@@ -16,12 +16,12 @@
 AAuraProjectile::AAuraProjectile()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	bReplicates = true;//注意
+	bReplicates = true; //注意
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	SetRootComponent(SphereComponent);
 	SphereComponent->SetCollisionObjectType(ECC_Projectile);
-	SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);//仅查询（无碰撞）
+	SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly); //仅查询（无碰撞）
 	SphereComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 	SphereComponent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 	SphereComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
@@ -41,7 +41,6 @@ void AAuraProjectile::BeginPlay()
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AAuraProjectile::OnSphereBeginOverlap);
 	// 设置在BeginPlay中而非默认构造函数中，因为这个组件不是一直在Actor上，而是不断在世界中移动
 	LoopingSoundComponent = UGameplayStatics::SpawnSoundAttached(LoopingSound, GetRootComponent());
-	
 }
 
 void AAuraProjectile::OnHit()
@@ -56,7 +55,7 @@ void AAuraProjectile::OnHit()
 		this,
 		ImpactEffect,
 		GetActorLocation());
-		
+
 	if (LoopingSoundComponent)
 	{
 		LoopingSoundComponent->Stop();
@@ -103,8 +102,8 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 			DamageEffectParams.TargetAbilitySystemComponent = TargetASC;
 			UAuraAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 		}
-		
-		Destroy();//其会自动调用Destroyed()
+
+		Destroy(); //其会自动调用Destroyed()
 	}
 	else
 	{

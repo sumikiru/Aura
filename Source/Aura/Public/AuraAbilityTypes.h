@@ -48,9 +48,18 @@ struct FAuraGameplayEffectContext : public FGameplayEffectContext
 
 	bool IsCriticalHit() const { return bIsCriticalHit; }
 	bool IsBlockedHit() const { return bIsBlockedHit; }
+	bool IsSuccessfulDebuff() const { return bIsSuccessfulDebuff; }
+	float GetDebuffDamage() const { return DebuffDamage; }
+	float GetDebuffFrequency() const { return DebuffFrequency; }
+	float GetDebuffDuration() const { return DebuffDuration; }
+	TSharedPtr<FGameplayTag> GetDamageType() const { return DamageType; }
 
 	void SetIsCriticalHit(const bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
 	void SetIsBlockedHit(const bool bInIsBlockedHit) { bIsBlockedHit = bInIsBlockedHit; }
+	void SetIsSuccessfulDebuff(const bool bInIsSuccessfulDebuff) { bIsSuccessfulDebuff = bInIsSuccessfulDebuff; }
+	void SetDebuffDamage(const float InDebuffDamage) { DebuffDamage = InDebuffDamage; }
+	void SetDebuffFrequency(const float InDebuffFrequency) { DebuffFrequency = InDebuffFrequency; }
+	void SetDebuffDuration(const float InDebuffDuration) { DebuffDuration = InDebuffDuration; }
 
 	/** Returns the actual struct used for serialization, subclasses must override this! */
 	virtual UScriptStruct* GetScriptStruct() const override
@@ -81,9 +90,17 @@ struct FAuraGameplayEffectContext : public FGameplayEffectContext
 protected:
 	UPROPERTY()
 	bool bIsBlockedHit = false;
-
 	UPROPERTY()
 	bool bIsCriticalHit = false;
+	UPROPERTY()
+	bool bIsSuccessfulDebuff = false;
+	UPROPERTY()
+	float DebuffDamage = 0.f;
+	UPROPERTY()
+	float DebuffFrequency = 0.f;
+	UPROPERTY()
+	float DebuffDuration = 0.f;
+	TSharedPtr<FGameplayTag> DamageType; // TSharedPtr自动处理内存管理，不需要UPROPERTY()
 };
 
 /** struct + template的组合可以让我们使用同一个结构体名称（注意：只是名称相同，但是本质上已经不同了），实现不同的结构体功能，可以将其理解为设计模式中的工程模式。*/
