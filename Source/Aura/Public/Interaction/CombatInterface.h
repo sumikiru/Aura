@@ -3,11 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemComponent.h"
 #include "GameplayTagContainer.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
 class UNiagaraSystem;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnASCRegistered, UAbilitySystemComponent*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDeath, AActor*, DeadActor);
 
 USTRUCT(BlueprintType)
 struct FTaggedMontage
@@ -43,7 +48,7 @@ public:
 	// 去掉virtual关键字，因为BlueprintNativeEvent底层机制是：UHT默认实现virtual int32 GetPlayerLevel_Implementation();
 	UFUNCTION(BlueprintNativeEvent)
 	int32 GetPlayerLevel();
-	
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FVector GetCombatSocketLocation(const FGameplayTag& MontageTag);
 
@@ -57,7 +62,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsDead() const;
-	
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	AActor* GetAvatar();
 
@@ -78,4 +83,11 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	ECharacterClass GetCharacterClass();
+
+	/**
+	 * 未使用标记宏UFUNCTION，也就未使用BlueprintImplementableEvent，需要加上virtual关键字
+	 * 无法使用ICombatInterface::Execute_GetOnASCRegisteredDelegate()
+	 */
+	virtual FOnASCRegistered GetOnASCRegisteredDelegate() = 0;
+	virtual FOnDeath GetOnDeathDelegate() = 0;
 };

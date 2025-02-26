@@ -80,7 +80,7 @@ void UExecCalc_Damage::DetermineDebuff(const FGameplayEffectCustomExecutionParam
 	for (TTuple<FGameplayTag, FGameplayTag> Pair : GameplayTags.DamageTypesToDebuffs)
 	{
 		const FGameplayTag& DamageType = Pair.Key;
-		const FGameplayTag& DebuffType = Pair.Value;
+		// const FGameplayTag& DebuffType = Pair.Value;
 		const float TypeDamage = Spec.GetSetByCallerMagnitude(DamageType, false, -1.f);
 		// 找到DamageType
 		// .5 padding for floating point [im]precision
