@@ -63,6 +63,10 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		{
 			RepBits |= 1 << 13;
 		}
+		if (!DeathImpulse.IsZero())
+		{
+			RepBits |= 1 << 14;
+		}
 	}
 
 	/**
@@ -71,7 +75,7 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 	 * 例如，在你设计模块间接口时，暂时无法判定传参类型。
 	 * 就可以通过void*传入，在函数中将指针转化你需要的类型就可以了。 
 	 */
-	Ar.SerializeBits(&RepBits, 14);
+	Ar.SerializeBits(&RepBits, 15);
 
 	if (RepBits & (1 << 0))
 	{
@@ -148,6 +152,10 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 			}
 		}
 		DamageType->NetSerialize(Ar, Map, bOutSuccess);
+	}
+	if (RepBits & (1 << 14))
+	{
+		DeathImpulse.NetSerialize(Ar, Map, bOutSuccess);
 	}
 
 	if (Ar.IsLoading())

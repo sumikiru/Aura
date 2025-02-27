@@ -239,6 +239,15 @@ FGameplayTag UAuraAbilitySystemLibrary::GetDamageType(const FGameplayEffectConte
 	return FGameplayTag();
 }
 
+FVector UAuraAbilitySystemLibrary::GetDeathImpulse(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FAuraGameplayEffectContext* AuraGameplayEffectContext = static_cast<const FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return AuraGameplayEffectContext->GetDeathImpulse();
+	}
+	return FVector::ZeroVector;
+}
+
 void UAuraAbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, const bool bInIsBlockedHit)
 {
 	if (FAuraGameplayEffectContext* AuraGameplayEffectContext = static_cast<FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
@@ -296,9 +305,16 @@ void UAuraAbilitySystemLibrary::SetDamageType(FGameplayEffectContextHandle& Effe
 	}
 }
 
-void UAuraAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* WorldContextObject,
-                                                           TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& ActorsToIgnore,
-                                                           const float Radius,
+void UAuraAbilitySystemLibrary::SetDeathImpulse(FGameplayEffectContextHandle& EffectContextHandle, const FVector& InDeathImpulse)
+{
+	if (FAuraGameplayEffectContext* AuraGameplayEffectContext = static_cast<FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		AuraGameplayEffectContext->SetDeathImpulse(InDeathImpulse);
+	}
+}
+
+void UAuraAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors,
+                                                           const TArray<AActor*>& ActorsToIgnore, const float Radius,
                                                            const FVector& SphereOriginLocation)
 {
 	// 参照UGameplayStatics::ApplyRadialDamageWithFalloff
@@ -348,6 +364,7 @@ FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyDamageEffect(const 
 	// 创建GE的上下文句柄
 	FGameplayEffectContextHandle EffectContextHandle = DamageEffectParams.SourceAbilitySystemComponent->MakeEffectContext();
 	EffectContextHandle.AddSourceObject(SourceAvatarActor);
+	SetDeathImpulse(EffectContextHandle, DamageEffectParams.DeathImpulse);
 
 	// 根据句柄和类创建GE实例
 	const FGameplayEffectSpecHandle SpecHandle = DamageEffectParams.SourceAbilitySystemComponent->

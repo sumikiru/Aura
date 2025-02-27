@@ -31,6 +31,7 @@ struct FDamageEffectParams
 	float AbilityLevel = 1.f;
 	UPROPERTY()
 	FGameplayTag DamageType = FGameplayTag();
+	// Debuff
 	UPROPERTY()
 	float DebuffChance = 0.f;
 	UPROPERTY()
@@ -39,6 +40,11 @@ struct FDamageEffectParams
 	float DebuffDuration = 0.f;
 	UPROPERTY()
 	float DebuffFrequency = 0.f;
+	// Death Impulse
+	UPROPERTY()
+	float DeathImpulseMagnitude = 0.f;
+	UPROPERTY()
+	FVector DeathImpulse = FVector::ZeroVector;
 };
 
 USTRUCT(BlueprintType)
@@ -53,6 +59,7 @@ struct FAuraGameplayEffectContext : public FGameplayEffectContext
 	float GetDebuffFrequency() const { return DebuffFrequency; }
 	float GetDebuffDuration() const { return DebuffDuration; }
 	TSharedPtr<FGameplayTag> GetDamageType() const { return DamageType; }
+	FVector GetDeathImpulse() const { return DeathImpulse; }
 
 	void SetIsCriticalHit(const bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
 	void SetIsBlockedHit(const bool bInIsBlockedHit) { bIsBlockedHit = bInIsBlockedHit; }
@@ -61,6 +68,7 @@ struct FAuraGameplayEffectContext : public FGameplayEffectContext
 	void SetDebuffFrequency(const float InDebuffFrequency) { DebuffFrequency = InDebuffFrequency; }
 	void SetDebuffDuration(const float InDebuffDuration) { DebuffDuration = InDebuffDuration; }
 	void SetDamageType(const TSharedPtr<FGameplayTag>& InDamageType) { DamageType = InDamageType; }
+	void SetDeathImpulse(const FVector& InDeathImpulse) { DeathImpulse = InDeathImpulse; }
 
 	/** Returns the actual struct used for serialization, subclasses must override this! */
 	virtual UScriptStruct* GetScriptStruct() const override
@@ -102,6 +110,8 @@ protected:
 	UPROPERTY()
 	float DebuffDuration = 0.f;
 	TSharedPtr<FGameplayTag> DamageType; // TSharedPtr自动处理内存管理，不需要UPROPERTY()
+	UPROPERTY()
+	FVector DeathImpulse = FVector::ZeroVector; // 死亡时收到的冲击力方向
 };
 
 /** struct + template的组合可以让我们使用同一个结构体名称（注意：只是名称相同，但是本质上已经不同了），实现不同的结构体功能，可以将其理解为设计模式中的工程模式。*/

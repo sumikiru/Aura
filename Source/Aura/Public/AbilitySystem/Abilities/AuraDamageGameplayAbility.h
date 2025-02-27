@@ -38,6 +38,8 @@ protected:
 	float DebuffFrequency = 1.f;
 	UPROPERTY(EditDefaultsOnly, Category = "Damage|Debuff")
 	float DebuffDuration = 5.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Damage|Death Impulse")
+	float DeathImpulseMagnitude = 15000.f;	// 不设置FVector DeathImpulse
 
 	UFUNCTION(BlueprintPure)
 	FTaggedMontage GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const;
