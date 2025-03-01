@@ -49,7 +49,20 @@ void AAuraEnemy::PossessedBy(AController* NewController)
 	AuraAIController->GetBlackboardComponent()->SetValueAsBool(BB_HitReactingKey, false);
 	const bool bIsRangedAttacker = CharacterClass != ECharacterClass::Warrior;
 	AuraAIController->GetBlackboardComponent()->SetValueAsBool(BB_RangedAttackerKey, bIsRangedAttacker);
-	
+}
+
+void AAuraEnemy::ReceiveKnockback(const FVector& KnockbackForce)
+{
+	// AuraAIController只在服务端上有效，所以客户端上敌人受击以后会出现UE崩溃。所以需要if检查，只在服务器设置值
+	if (AuraAIController)
+	{
+		// 需要注意一点：如果是玩家击中敌人，如果当敌人正在执行行为树中的节点MoveTo时，会导致XY的移动失效，从而只有上下的移动
+		// 需要在LaunchCharacter之前，停止行为树中的节点MoveTo，该节点必须手动中断
+		// todo:只有Goblin_Spear无法解决
+		AuraAIController->StopMovement();
+	}
+
+	Super::ReceiveKnockback(KnockbackForce);
 }
 
 void AAuraEnemy::HighlightActor()
@@ -58,8 +71,8 @@ void AAuraEnemy::HighlightActor()
 	 * 记得先加入PostProcessVolume到World中，并且渲染功能->后期处理材质->添加PP_Highlight
 	 * 然后到项目设置中搜索custom depth，修改自定义深度-模板通道为"启用模板"
 	 */
-	GetMesh()->SetRenderCustomDepth(true);//渲染自定义深度通道
-	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);//自定义深度模板值
+	GetMesh()->SetRenderCustomDepth(true); //渲染自定义深度通道
+	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED); //自定义深度模板值
 	Weapon->SetRenderCustomDepth(true);
 	Weapon->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
 }
@@ -113,7 +126,7 @@ void AAuraEnemy::BeginPlay()
 	// 可选：四处移动而又不至于互相卡住，但效果较差。
 	// GetCharacterMovement()->bUseRVOAvoidance = true;
 	// GetCharacterMovement()->bOrientRotationToMovement = true;
-	
+
 	InitAbilityActorInfo();
 	if (HasAuthority())
 	{
@@ -124,7 +137,7 @@ void AAuraEnemy::BeginPlay()
 	{
 		AuraUserWidget->SetWidgetController(this);
 	}
-	
+
 	if (const UAuraAttributeSet* AuraAS = Cast<UAuraAttributeSet>(AttributeSet))
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAS->GetHealthAttribute()).AddLambda(
@@ -157,13 +170,12 @@ void AAuraEnemy::BeginPlay()
 			OnEnemyMaxHealthChanged.Broadcast(AuraAS->GetMaxHealth());
 		}
 	}
-	
 }
 
 void AAuraEnemy::InitAbilityActorInfo()
 {
 	check(AbilitySystemComponent);
-	AbilitySystemComponent->InitAbilityActorInfo(this,this);
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
 	if (HasAuthority())

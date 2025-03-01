@@ -163,6 +163,30 @@ public:
 	static bool IsNotFriend(const AActor* FirstActor, const AActor* SecondActor);
 
 	/**
+	 * 计算均匀分布的多段角度
+	 * @param Forward 向前方向（正方向）
+	 * @param Axis 基于旋转的轴，比如(0, 0, 1)
+	 * @param SpreadAngleDeg 总范围的角度
+	 * @param NumRotators 分成多少段
+	 * @return 计算后得出的均匀分布的FRotator数组
+	 * @note 常用于计算投掷物的朝向
+	 */
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
+	static TArray<FRotator> EvenlySpacedRotators(const FVector& Forward, const FVector& Axis, const float SpreadAngleDeg, const int32 NumRotators);
+
+	/**
+	 * 计算均匀分布的多段朝向
+	 * @param Forward 向前方向（正方向）
+	 * @param Axis 基于旋转的轴，比如(0, 0, 1)
+	 * @param SpreadAngleDeg 总范围的角度
+	 * @param NumVectors 分成多少段
+	 * @return 计算后得出的均匀分布的FVector数组
+	 * @note 常用于计算投掷物的朝向
+	 */
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
+	static TArray<FVector> EvenlyRotatedVectors(const FVector& Forward, const FVector& Axis, const float SpreadAngleDeg, const int32 NumVectors);
+
+	/**
 	 * 应用Debuff效果
 	 * @param DamageEffectParams 负面效果结构体，存储了应用Debuff时需要用到的所有数据
 	 * @return 一个GameplayEffectContextHandle，用于安全传递 GameplayEffectContext，处理内存和网络传输。

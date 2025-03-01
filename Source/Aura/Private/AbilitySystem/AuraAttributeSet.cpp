@@ -7,6 +7,7 @@
 #include "AuraAbilityTypes.h"
 #include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "Characters/AuraCharacterBase.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
@@ -166,7 +167,10 @@ void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 			const FVector& KnockbackForce = UAuraAbilitySystemLibrary::GetKnockbackForce(Props.EffectContextHandle);
 			if (!KnockbackForce.IsNearlyZero(1.f))
 			{
-				Props.TargetCharacter->LaunchCharacter(KnockbackForce, true, true);
+				// 需要注意一点：如果是玩家击中敌人，如果当敌人正在执行行为树中的节点MoveTo时，会导致XY的移动失效，从而只有上下的移动
+				// 需要在LaunchCharacter之前，停止行为树中的节点MoveTo，该节点必须手动中断
+				AAuraCharacterBase* TargetCharacter = Cast<AAuraCharacterBase>(Props.TargetCharacter);
+				TargetCharacter->ReceiveKnockback(KnockbackForce); // Props.TargetCharacter->LaunchCharacter(KnockbackForce, true, true);
 			}
 		}
 

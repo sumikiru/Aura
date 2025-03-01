@@ -23,6 +23,7 @@ class AURA_API AAuraEnemy : public AAuraCharacterBase, public IEnemyInterface
 public:
 	AAuraEnemy();
 	virtual void PossessedBy(AController* NewController) override;
+	virtual void ReceiveKnockback(const FVector& KnockbackForce) override;
 
 	//~ Begin EnemyInterface
 	virtual void HighlightActor() override;
@@ -41,7 +42,7 @@ public:
 	 * 由于AuraEnemy.h包含了头文件OverlayWidgetController.h，而其中重名的OnHealthChanged和OnMaxHealthChanged会导致BeginPlay中设置的BroadCast出现异常
 	 * 使得变更后的值无法被正确地广播出去，从而让蓝图UI中显示的Health和MaxHealth的值在初始化阶段始终等于设定的默认值
 	 */
-	UPROPERTY(BlueprintAssignable) 
+	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnEnemyHealthChanged;
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnEnemyMaxHealthChanged;
@@ -81,5 +82,5 @@ protected:
 
 	/**记得还要在BP_EnemyBase中设置Pawn->AI控制器类为BP_AuraAIController*/
 	UPROPERTY()
-	TObjectPtr<AAuraAIController> AuraAIController; 
+	TObjectPtr<AAuraAIController> AuraAIController;
 };

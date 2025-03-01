@@ -35,6 +35,11 @@ UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+void AAuraCharacterBase::ReceiveKnockback(const FVector& KnockbackForce)
+{
+	LaunchCharacter(KnockbackForce, true, true);
+}
+
 UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation()
 {
 	return HitReactMontage;

@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Components/SplineComponent.h"
 #include "GameFramework/Character.h"
@@ -25,7 +26,7 @@ AAuraPlayerController::AAuraPlayerController()
 void AAuraPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
-	
+
 	CursorTrace();
 	AutoRun();
 }
@@ -37,7 +38,8 @@ void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmount, 
 	{
 		UDamageTextComponent* DamageText = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextComponentClass);
 		DamageText->RegisterComponent(); // 动态创建组件，而不是在构造函数中CreateDefaultSubObject
-		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);// 动态绑定组件，相当于SetupAttachment
+		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		// 动态绑定组件，相当于SetupAttachment
 		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform); // 分离开是为了播放动画时伤害数字不会跟随TargetCharacter移动
 		DamageText->SetDamageText(DamageAmount, bBlockedHit, bCriticalHit);
 	}
@@ -55,7 +57,8 @@ void AAuraPlayerController::AutoRun()
 		// 更改人物移动速度、Direction缩小（也会改变速度）等均不现实，应该考虑让NavPath生成的点至少距离障碍物一个pawn胶囊体半径的长度，且尽量多生成点。
 		// 同时由于敌人的动态移动可能产生碰撞，应该考虑如果为进入目标半径范围内，应该继续移动
 		// 解决方法：频繁更新PathPoints，更新频率够高就会变得自然，但是开销较大。可以使用定时器
-		const FVector LocationOnSpline = Spline->FindLocationClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+		const FVector LocationOnSpline = Spline->
+			FindLocationClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
 		const FVector Direction = Spline->FindDirectionClosestToWorldLocation(LocationOnSpline, ESplineCoordinateSpace::World);
 
 		const float DistanceToDestination = (LocationOnSpline - CachedDestination).Length();
@@ -65,7 +68,7 @@ void AAuraPlayerController::AutoRun()
 			bAutoRunning = false;
 			return;
 		}
-		
+
 		ControlledPawn->AddMovementInput(Direction);
 	}
 }
@@ -86,8 +89,6 @@ void AAuraPlayerController::UpdatePathPoints()
 		for (const FVector& PointLoc : NavPath->PathPoints)
 		{
 			Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
-			DrawDebugSphere(GetWorld(), PointLoc, 10.f, 10, FColor::Green, false, 5.f);
-			DrawDebugSphere(GetWorld(), CachedDestination, 10.f, 10, FColor::Red, false, 5.f);
 		}
 		// 有时候CachedDestination = Hit.ImpactPoint;会使得该CachedDestination在NavPath之外，因此需要更新至NavPath的最后一个点，从而确保AutoRun()中角色能在到达边界后停下
 		if (NavPath->PathPoints.Num() > 0) //防止数组越界
@@ -101,7 +102,7 @@ void AAuraPlayerController::UpdatePathPoints()
 void AAuraPlayerController::CursorTrace()
 {
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
-	if(!CursorHit.bBlockingHit)
+	if (!CursorHit.bBlockingHit)
 	{
 		return;
 	}
@@ -146,7 +147,6 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 		bIsTargeting = CurrentActor != nullptr;
 		bAutoRunning = false;
 	}
-	
 }
 
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
@@ -170,7 +170,10 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		if (FollowTime <= ShortPressThreshold)
 		{
 			// 定时更新PathPoints
-			GetWorldTimerManager().SetTimer(UpdatePathPointsTimerHandle, this, &AAuraPlayerController::UpdatePathPoints, UpdatePathPointsTimeRate, true, 0);
+			GetWorldTimerManager().SetTimer(UpdatePathPointsTimerHandle, this, &AAuraPlayerController::UpdatePathPoints, UpdatePathPointsTimeRate,
+			                                true, 0);
+			// 添加点击时的Niagara
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
 		}
 		FollowTime = 0.f;
 		bIsTargeting = false;
@@ -230,7 +233,7 @@ void AAuraPlayerController::BeginPlay()
 
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	//不应check(Subsystem);仅在本地的客户端中不为空
-	if(Subsystem)
+	if (Subsystem)
 	{
 		Subsystem->AddMappingContext(AuraInputMappingContext, 0);
 	}
@@ -252,7 +255,8 @@ void AAuraPlayerController::SetupInputComponent()
 	AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
 	AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &AAuraPlayerController::ShiftPressed);
 	AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &AAuraPlayerController::ShiftReleased);
-	AuraInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
+	AuraInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased,
+	                                       &ThisClass::AbilityInputTagHeld);
 }
 
 void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -265,7 +269,7 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
 	//注意CastChecked<APawn>(GetPawn())和GetPawn<APawn>()的区别
-	if(APawn* ControlledPawn = GetPawn<APawn>())
+	if (APawn* ControlledPawn = GetPawn<APawn>())
 	{
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);

@@ -373,6 +373,52 @@ bool UAuraAbilitySystemLibrary::IsNotFriend(const AActor* FirstActor, const AAct
 	return false;
 }
 
+TArray<FRotator> UAuraAbilitySystemLibrary::EvenlySpacedRotators(const FVector& Forward, const FVector& Axis, const float SpreadAngleDeg,
+                                                                 const int32 NumRotators)
+{
+	TArray<FRotator> Rotators;
+
+	const FVector LeftSpreadBoundary = Forward.RotateAngleAxis(-SpreadAngleDeg / 2.f, Axis);
+	if (NumRotators > 1)
+	{
+		const float DeltaSpreadDegree = SpreadAngleDeg / (NumRotators - 1);
+		for (int32 i = 0; i < NumRotators; i++)
+		{
+			const FVector Direction = LeftSpreadBoundary.RotateAngleAxis(DeltaSpreadDegree * i, Axis);
+			Rotators.Add(Direction.Rotation());
+		}
+	}
+	else
+	{
+		Rotators.Add(Forward.Rotation());
+	}
+
+	return Rotators;
+}
+
+TArray<FVector> UAuraAbilitySystemLibrary::EvenlyRotatedVectors(const FVector& Forward, const FVector& Axis, const float SpreadAngleDeg,
+                                                                const int32 NumVectors)
+{
+	TArray<FVector> Vectors;
+
+	const FVector LeftSpreadBoundary = Forward.RotateAngleAxis(-SpreadAngleDeg / 2.f, Axis);
+	if (NumVectors > 1)
+	{
+		const float DeltaSpreadDegree = SpreadAngleDeg / (NumVectors - 1);
+		for (int32 i = 0; i < NumVectors; i++)
+		{
+			const FVector Direction = LeftSpreadBoundary.RotateAngleAxis(DeltaSpreadDegree * i, Axis);
+			Vectors.Add(Direction);
+		}
+	}
+	else
+	{
+		Vectors.Add(Forward);
+	}
+
+	return Vectors;
+}
+
 FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyDamageEffect(const FDamageEffectParams& DamageEffectParams)
 {
 	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();

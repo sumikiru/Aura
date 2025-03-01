@@ -5,7 +5,6 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "AuraGameplayTags.h"
 #include "Actor/AuraProjectile.h"
 #include "Interaction/CombatInterface.h"
 
@@ -34,9 +33,6 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 		GetAvatarActorFromActorInfo(),
 		SocketTag /*旧为FAuraGameplayTags::Get().CombatSocket_Weapon*/);
 	FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
-	DrawDebugPoint(GetWorld(), SocketLocation, 10.0f, FColor::Red, false, 100.f);
-	DrawDebugPoint(GetWorld(), ProjectileTargetLocation, 10.0f, FColor::Red, false, 100.f);
-	DrawDebugLine(GetWorld(), SocketLocation, ProjectileTargetLocation, FColor::Green, false, 100.f);
 	if (bOverridePitch)
 	{
 		Rotation.Pitch = PitchOverride;

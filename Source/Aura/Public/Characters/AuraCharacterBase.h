@@ -25,6 +25,7 @@ public:
 	AAuraCharacterBase();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	virtual void ReceiveKnockback(const FVector& KnockbackForce);
 
 	//~ Begin CombatInterface
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
