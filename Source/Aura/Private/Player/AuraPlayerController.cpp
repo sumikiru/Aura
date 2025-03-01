@@ -101,6 +101,22 @@ void AAuraPlayerController::UpdatePathPoints()
 
 void AAuraPlayerController::CursorTrace()
 {
+	//判断当前事件是否被阻挡，如果事件被阻挡，则清除相关内容
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_CursorTrace))
+	{
+		if (LastActor)
+		{
+			LastActor->UnHighlightActor();
+		}
+		if (CurrentActor)
+		{
+			CurrentActor->UnHighlightActor();
+		}
+		LastActor = nullptr;
+		CurrentActor = nullptr;
+		return;
+	}
+
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	if (!CursorHit.bBlockingHit)
 	{
@@ -137,6 +153,11 @@ void AAuraPlayerController::CursorTrace()
 
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
+
 	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LeftMouseButton))
 	{
 		bIsTargeting = CurrentActor != nullptr;
@@ -151,6 +172,11 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputReleased))
+	{
+		return;
+	}
+
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LeftMouseButton))
 	{
 		if (GetASC())
@@ -172,8 +198,11 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 			// 定时更新PathPoints
 			GetWorldTimerManager().SetTimer(UpdatePathPointsTimerHandle, this, &AAuraPlayerController::UpdatePathPoints, UpdatePathPointsTimeRate,
 			                                true, 0);
-			// 添加点击时的Niagara
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
+			if (GetASC() && !GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputPressed))
+			{
+				// 添加点击时的Niagara
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
+			}
 		}
 		FollowTime = 0.f;
 		bIsTargeting = false;
@@ -182,6 +211,11 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 
 void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputHeld))
+	{
+		return;
+	}
+
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LeftMouseButton))
 	{
 		if (GetASC())
@@ -261,6 +295,11 @@ void AAuraPlayerController::SetupInputComponent()
 
 void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
+
 	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);

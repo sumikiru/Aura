@@ -364,4 +364,24 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FName(TEXT("Montage.Attack.4")),
 		FString(TEXT("Attack 4"))
 	);
+
+	/**
+	 * Player Tags
+	 */
+	GameplayTags.Player_Block_CursorTrace = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Player.Block.CursorTrace")),
+		FString(TEXT("Block tracing under the cursor"))
+	);
+	GameplayTags.Player_Block_InputPressed = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Player.Block.InputPressed")),
+		FString(TEXT("Block Input Pressed callback for input"))
+	);
+	GameplayTags.Player_Block_InputHeld = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Player.Block.InputHeld")),
+		FString(TEXT("Block Input Held callback for input"))
+	);
+	GameplayTags.Player_Block_InputReleased = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Player.Block.InputReleased")),
+		FString(TEXT("Block Input Released callback for input"))
+	);
 }
