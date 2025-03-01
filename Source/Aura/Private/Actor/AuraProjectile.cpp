@@ -59,12 +59,18 @@ void AAuraProjectile::OnHit()
 	if (LoopingSoundComponent)
 	{
 		LoopingSoundComponent->Stop();
+		LoopingSoundComponent->DestroyComponent();
 	}
 	bHit = true;
 }
 
 void AAuraProjectile::Destroyed()
 {
+	if (LoopingSoundComponent)
+	{
+		LoopingSoundComponent->Stop();
+		LoopingSoundComponent->DestroyComponent();
+	}
 	// 如果还未被击中（击中前）且不在服务器上（客户端）
 	// 之所以使用bHit，是因为仅仅根据HasAuthority()判断，可能导致在OnSphereBeginOverlap之前执行Destroy()
 	if (!bHit && !HasAuthority())

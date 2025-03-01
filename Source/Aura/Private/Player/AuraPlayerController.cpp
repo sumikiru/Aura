@@ -137,15 +137,15 @@ void AAuraPlayerController::CursorTrace()
 
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	/*if (GetASC() == nullptr)
-	{
-		return;
-	}
-	GetASC()->AbilityInputTagPressed(InputTag);*/
 	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LeftMouseButton))
 	{
 		bIsTargeting = CurrentActor != nullptr;
 		bAutoRunning = false;
+	}
+	// 将事件传递给ASC，在ASC中对技能进行相关处理。
+	if (GetASC())
+	{
+		GetASC()->AbilityInputTagPressed(InputTag);
 	}
 }
 
