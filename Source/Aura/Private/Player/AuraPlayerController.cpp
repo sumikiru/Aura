@@ -195,7 +195,7 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	{
 		if (FollowTime <= ShortPressThreshold)
 		{
-			// 定时更新PathPoints
+			// 定时更新PathPoints，需要注意处于NavMesh中
 			GetWorldTimerManager().SetTimer(UpdatePathPointsTimerHandle, this, &AAuraPlayerController::UpdatePathPoints, UpdatePathPointsTimeRate,
 			                                true, 0);
 			if (GetASC() && !GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputPressed))

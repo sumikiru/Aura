@@ -84,9 +84,13 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
                                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                            const FHitResult& SweepResult)
 {
-	// todo: 需要在客户端同步，DamageEffectParams.SourceAbilitySystemComponent为空
+	/**
+	 * 详见UAuraAbilitySystemComponent::AbilityInputTagPressed，在AbilitySpec.IsActive()的情况下，调用InvokeReplicatedEvent进行同步
+	 * 此时DamageEffectParams.SourceAbilitySystemComponent有效，能获取到AvatarActor
+	 * 不应const AActor* SourceAvatarActor = GetInstigator();因为需要先设置this->SetInstigator()，否则必定为nullptr
+	 */
 	const AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
-	if (SourceAvatarActor == OtherActor)
+	if (SourceAvatarActor == nullptr || SourceAvatarActor == OtherActor)
 	{
 		return;
 	}
