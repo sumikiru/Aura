@@ -360,6 +360,74 @@ void UAuraAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* WorldC
 	}
 }
 
+void UAuraAbilitySystemLibrary::GetClosestTargets(int32 MaxTargets, const TArray<AActor*>& Actors, TArray<AActor*>& OutClosestTargets,
+                                                  const FVector& Origin)
+{
+	if (Actors.Num() <= MaxTargets)
+	{
+		OutClosestTargets = Actors;
+		return;
+	}
+
+	// 原方法--------------------------------------------------
+	/*TArray<AActor*> ActorsToCheck = Actors;
+	int32 NumTargetsFound = 0;
+
+	while (NumTargetsFound < MaxTargets)
+	{
+		if (ActorsToCheck.Num() == 0)
+		{
+			break;
+		}
+		double ClosestDistance = TNumericLimits<double>::Max();
+		AActor* ClosestActor;
+		for (AActor* PotentialTarget : ActorsToCheck)
+		{
+			const double Distance = (PotentialTarget->GetActorLocation() - Origin).Length();
+			if (Distance < ClosestDistance)
+			{
+				ClosestDistance = Distance;
+				ClosestActor = PotentialTarget;
+			}
+		}
+		ActorsToCheck.Remove(ClosestActor);
+		OutClosestTargets.AddUnique(ClosestActor);
+		NumTargetsFound++;
+	}*/
+
+	// 使用优先队列代替------------------------------------------
+	TArray<AActor*> ActorsToCheck = Actors;
+	TArray<TPair<double, AActor*>> DistanceHeap;
+	// 预分配内存提升性能
+	DistanceHeap.Reserve(ActorsToCheck.Num());
+	// 构建距离-对象映射
+	for (AActor* Actor : ActorsToCheck)
+	{
+		const double Distance = (Actor->GetActorLocation() - Origin).Length();
+		DistanceHeap.Emplace(Distance, Actor);
+	}
+	// 自定义堆排序谓词（最小堆）
+	auto MinHeapPredicate = [](const TPair<double, AActor*>& A, const TPair<double, AActor*>& B)
+	{
+		return A.Key < B.Key; // 距离更小的优先级更高
+	};
+	// 将数组转换为最小堆
+	DistanceHeap.Heapify(MinHeapPredicate);
+	// 提取最近目标
+	int32 NumTargetsFound = 0;
+	while (!DistanceHeap.IsEmpty() && NumTargetsFound < MaxTargets)
+	{
+		// 弹出堆顶最小元素
+		TPair<double, AActor*> ClosestPair;
+		DistanceHeap.HeapPop(ClosestPair, MinHeapPredicate);
+		if (ClosestPair.Value && !OutClosestTargets.Contains(ClosestPair.Value))
+		{
+			OutClosestTargets.AddUnique(ClosestPair.Value);
+			NumTargetsFound++;
+		}
+	}
+}
+
 bool UAuraAbilitySystemLibrary::IsNotFriend(const AActor* FirstActor, const AActor* SecondActor)
 {
 	if (FirstActor->ActorHasTag(FName("Player")))

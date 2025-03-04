@@ -158,6 +158,15 @@ public:
 	static void GetLivePlayersWithinRadius(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors,
 	                                       const TArray<AActor*>& ActorsToIgnore, const float Radius,
 	                                       const FVector& SphereOriginLocation);
+	/**
+	 * 获取所有目标中最近的几个目标
+	 * @param MaxTargets 最大目标数量
+	 * @param Actors 所有目标数组
+	 * @param OutClosestTargets 记录下的最近目标数组
+	 * @param Origin 寻找半径的中心点位置，以该点为原点寻找目标
+	 */
+	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
+	static void GetClosestTargets(int32 MaxTargets, const TArray<AActor*>& Actors, TArray<AActor*>& OutClosestTargets, const FVector& Origin);
 	/** 判断攻击的角色是否为友军 */
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
 	static bool IsNotFriend(const AActor* FirstActor, const AActor* SecondActor);
