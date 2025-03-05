@@ -87,8 +87,9 @@ public:
 	/**
 	 * 未使用标记宏UFUNCTION，也就未使用BlueprintImplementableEvent，需要加上virtual关键字
 	 * 无法使用ICombatInterface::Execute_GetOnASCRegisteredDelegate()
+	 * 获取Delegate时，返回值应为引用，否则只会为拷贝的副本绑定事件，导致DebuffComponent在DebuffTagChanged事件中无法正常添加或删除
 	 */
-	virtual FOnASCRegistered GetOnASCRegisteredDelegate() = 0;
+	virtual FOnASCRegistered& GetOnASCRegisteredDelegate() = 0;
 	virtual FOnDeath& GetOnDeathDelegate() = 0;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
@@ -96,4 +97,8 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	USkeletalMeshComponent* GetWeapon();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsBeingShocked() const;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetIsBeingShocked(bool bInShock);
 };

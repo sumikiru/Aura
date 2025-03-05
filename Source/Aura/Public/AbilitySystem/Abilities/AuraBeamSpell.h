@@ -36,6 +36,8 @@ public:
 	void ApplyDamageToSingleTarget(AActor* DamagedTarget, const FGameplayTag& DamageTypeTag);
 	UFUNCTION(BlueprintCallable)
 	void ApplyDamageToAllTargets(AActor* FirstTraceTarget, TArray<AActor*> AdditionalTargets, const FGameplayTag& DamageTypeTag);
+	UFUNCTION(BlueprintCallable)
+	void ApplyDebuffToSingleTarget(AActor* TargetActor);
 	/**
 	 * 鼠标命中的敌人（初始目标）死亡处理
 	 * @param DeadActor 死亡的初始目标

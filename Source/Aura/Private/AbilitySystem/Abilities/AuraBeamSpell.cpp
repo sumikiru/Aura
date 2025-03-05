@@ -138,3 +138,12 @@ void UAuraBeamSpell::ApplyDamageToAllTargets(AActor* FirstTraceTarget, TArray<AA
 		ApplyDamageToSingleTarget(Target, DamageTypeTag);
 	}
 }
+
+void UAuraBeamSpell::ApplyDebuffToSingleTarget(AActor* TargetActor)
+{
+	const FDamageEffectParams& Params = MakeDamageEffectParamsFromClassDefaults(TargetActor);
+	if (K2_HasAuthority())
+	{
+		UAuraAbilitySystemLibrary::ApplyDamageEffect(Params);
+	}
+}

@@ -32,6 +32,8 @@ AAuraEnemy::AAuraEnemy()
 
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBarWidgetComponent"));
 	HealthBar->SetupAttachment(GetRootComponent());
+
+	BaseWalkSpeed = 250.f;
 }
 
 void AAuraEnemy::PossessedBy(AController* NewController)
@@ -58,7 +60,7 @@ void AAuraEnemy::ReceiveKnockback(const FVector& KnockbackForce)
 	{
 		// 需要注意一点：如果是玩家击中敌人，如果当敌人正在执行行为树中的节点MoveTo时，会导致XY的移动失效，从而只有上下的移动
 		// 需要在LaunchCharacter之前，停止行为树中的节点MoveTo，该节点必须手动中断
-		// todo:只有Goblin_Spear无法解决
+		// Goblin_Spear无法解决，经检查应该将AM_GoblinSpear_HitReact中的HitReact_Goblin_cut中的根运动->启用根运动选项关闭
 		AuraAIController->StopMovement();
 	}
 
@@ -183,6 +185,9 @@ void AAuraEnemy::InitAbilityActorInfo()
 		InitializeDefaultAttributes();
 	}
 	OnAscRegisteredDelegate.Broadcast(AbilitySystemComponent);
+	// 注册
+	AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Debuff_Stun, EGameplayTagEventType::NewOrRemoved)
+	                      .AddUObject(this, &AAuraEnemy::StunTagChanged);
 }
 
 void AAuraEnemy::InitializeDefaultAttributes() const
@@ -193,4 +198,15 @@ void AAuraEnemy::InitializeDefaultAttributes() const
 		Level,
 		AbilitySystemComponent
 	);
+}
+
+void AAuraEnemy::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	Super::StunTagChanged(CallbackTag, NewCount);
+
+	// 修改黑板中Stun的值
+	if (AuraAIController && AuraAIController->GetBlackboardComponent())
+	{
+		AuraAIController->GetBlackboardComponent()->SetValueAsBool(BB_StunnedKey, bIsStunned);
+	}
 }

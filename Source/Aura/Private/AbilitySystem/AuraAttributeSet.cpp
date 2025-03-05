@@ -160,9 +160,14 @@ void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		}
 		else
 		{
-			FGameplayTagContainer TagContainer;
-			TagContainer.AddTag(FAuraGameplayTags::Get().Effects_HitReact);
-			Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			// 如果处于Shocked状态（被Electrocute命中后的效果，算是一种特殊的HitReact，但不是Stun这种Debuff效果）,
+			// 则不表现出HitReact；反之表现HitReact
+			if (Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsBeingShocked(Props.TargetCharacter))
+			{
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(FAuraGameplayTags::Get().Effects_HitReact);
+				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
 
 			const FVector& KnockbackForce = UAuraAbilitySystemLibrary::GetKnockbackForce(Props.EffectContextHandle);
 			if (!KnockbackForce.IsNearlyZero(1.f))
@@ -211,7 +216,16 @@ void UAuraAttributeSet::Debuff(const FEffectProperties& Props)
 	// 采用GameplayEffect效果组件，实现Grant Tags to Target Actor
 	UTargetTagsGameplayEffectComponent& TargetTagsGEComponent = Effect->AddComponent<UTargetTagsGameplayEffectComponent>();
 	FInheritedTagContainer InheritedTagContainer;
-	InheritedTagContainer.AddTag(GameplayTags.DamageTypesToDebuffs[DamageType]);
+	const FGameplayTag DebuffTag = GameplayTags.DamageTypesToDebuffs[DamageType];
+	InheritedTagContainer.AddTag(DebuffTag);
+	// 眩晕后禁用输入
+	if (DebuffTag.MatchesTagExact(GameplayTags.Debuff_Stun))
+	{
+		InheritedTagContainer.AddTag(GameplayTags.Player_Block_CursorTrace);
+		InheritedTagContainer.AddTag(GameplayTags.Player_Block_InputHeld);
+		InheritedTagContainer.AddTag(GameplayTags.Player_Block_InputPressed);
+		InheritedTagContainer.AddTag(GameplayTags.Player_Block_InputReleased);
+	}
 	TargetTagsGEComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
 
 	// GE属性：Stacking

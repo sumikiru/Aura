@@ -16,7 +16,7 @@
 AAuraProjectile::AAuraProjectile()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	bReplicates = true; //注意
+	bReplicates = true; //注意，不代表Movement也会同步，需要在BeginPlay中开启复制运动选项
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	SetRootComponent(SphereComponent);
@@ -38,6 +38,8 @@ void AAuraProjectile::BeginPlay()
 	Super::BeginPlay();
 
 	SetLifeSpan(LifeSpan);
+	// 让Projectile的运行也复制到Client，同时需要在蓝图中确认勾选“复制运动”选项
+	SetReplicateMovement(true);
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AAuraProjectile::OnSphereBeginOverlap);
 	// 设置在BeginPlay中而非默认构造函数中，因为这个组件不是一直在Actor上，而是不断在世界中移动
 	LoopingSoundComponent = UGameplayStatics::SpawnSoundAttached(LoopingSound, GetRootComponent());
@@ -89,6 +91,10 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 	 * 此时DamageEffectParams.SourceAbilitySystemComponent有效，能获取到AvatarActor
 	 * 不应const AActor* SourceAvatarActor = GetInstigator();因为需要先设置this->SetInstigator()，否则必定为nullptr
 	 */
+	if (DamageEffectParams.SourceAbilitySystemComponent == nullptr)
+	{
+		return;
+	}
 	const AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
 	if (SourceAvatarActor == nullptr || SourceAvatarActor == OtherActor)
 	{

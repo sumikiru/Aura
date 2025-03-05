@@ -52,8 +52,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	bool bHitReacting = false;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
-	float BaseWalkSpeed = 250.f;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float LifeSpan = 2.f;
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
 	TObjectPtr<AActor> CombatTarget;
@@ -62,6 +60,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
 	virtual void InitializeDefaultAttributes() const override;
+	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 
 	//不需要复制
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
@@ -79,6 +78,8 @@ protected:
 	FName BB_DeadKey = TEXT("Dead");
 	UPROPERTY()
 	FName BB_RangedAttackerKey = TEXT("RangedAttacker");
+	UPROPERTY()
+	FName BB_StunnedKey = TEXT("Stunned");
 
 	/**记得还要在BP_EnemyBase中设置Pawn->AI控制器类为BP_AuraAIController*/
 	UPROPERTY()
