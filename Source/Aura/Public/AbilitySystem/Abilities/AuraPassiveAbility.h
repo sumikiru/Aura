@@ -19,4 +19,16 @@ public:
 	                             const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	void ReceiveDeactivate(const FGameplayTag& AbilityTag);
+
+protected:
+	UFUNCTION(BlueprintCallable)
+	void ApplyGEToOwner(const TSubclassOf<UGameplayEffect>& EffectClass);
+	UFUNCTION(BlueprintCallable)
+	void RemoveGEToOwner();
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	TSubclassOf<UGameplayEffect> PassiveEffectClass;
+
+private:
+	FActiveGameplayEffectHandle ActiveGEHandle;
 };
