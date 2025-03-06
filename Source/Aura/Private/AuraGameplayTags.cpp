@@ -306,7 +306,7 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	);
 
 	/**
-	 * Abilities
+	 * Offensive Abilities
 	 */
 	GameplayTags.Abilities_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName(TEXT("Abilities.Fire.FireBolt")),
@@ -315,6 +315,22 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Lightning_Electrocute = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName(TEXT("Abilities.Lightning.Electrocute")),
 		FString(TEXT("Electrocute Ability Tag"))
+	);
+
+	/**
+	 * Passive Abilities
+	 */
+	GameplayTags.Abilities_Passive_HaloOfProtection = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Abilities.Passive.HaloOfProtection")),
+		FString(TEXT("Halo Of Protection"))
+	);
+	GameplayTags.Abilities_Passive_LifeSiphon = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Abilities.Passive.LifeSiphon")),
+		FString(TEXT("Life Siphon"))
+	);
+	GameplayTags.Abilities_Passive_ManaSiphon = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName(TEXT("Abilities.Passive.ManaSiphon")),
+		FString(TEXT("Mana Siphon"))
 	);
 
 	/**
