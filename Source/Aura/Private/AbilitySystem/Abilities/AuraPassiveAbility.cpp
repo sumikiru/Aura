@@ -35,12 +35,10 @@ void UAuraPassiveAbility::ApplyGEToOwner(const TSubclassOf<UGameplayEffect>& Eff
 	if (PassiveSpecHandle.IsValid())
 	{
 		ActiveGEHandle = ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, PassiveSpecHandle);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("开启，生命+1"));
 	}
 }
 
 void UAuraPassiveAbility::RemoveGEToOwner()
 {
 	BP_RemoveGameplayEffectFromOwnerWithHandle(ActiveGEHandle);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("移除"));
 }
