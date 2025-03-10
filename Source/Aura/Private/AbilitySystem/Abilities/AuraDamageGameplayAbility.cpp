@@ -7,10 +7,10 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 
-void UAuraDamageGameplayAbility::CauseDamage(AActor* TargetActor)
+void UAuraDamageGameplayAbility::CauseDamage(AActor* TargetActor, const FVector RadialDamageOrigin)
 {
 	//生成配置
-	FDamageEffectParams Params = MakeDamageEffectParamsFromClassDefaults(TargetActor);
+	FDamageEffectParams Params = MakeDamageEffectParamsFromClassDefaults(TargetActor, RadialDamageOrigin);
 
 	//设置死亡冲击和击退
 	if (IsValid(TargetActor))
@@ -31,7 +31,7 @@ void UAuraDamageGameplayAbility::CauseDamage(AActor* TargetActor)
 	UAuraAbilitySystemLibrary::ApplyDamageEffect(Params);
 }
 
-FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor) const
+FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor, const FVector& RadialDamageOrigin) const
 {
 	FDamageEffectParams Params;
 	Params.WorldContextObject = GetAvatarActorFromActorInfo();
@@ -48,6 +48,13 @@ FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamsFromClassD
 	Params.DeathImpulseMagnitude = DeathImpulseMagnitude;
 	Params.KnockbackForceMagnitude = KnockbackForceMagnitude;
 	Params.KnockbackChance = KnockbackChance;
+	if (bIsRadialDamage)
+	{
+		Params.bIsRadialDamage = bIsRadialDamage;
+		Params.RadialDamageOrigin = RadialDamageOrigin;
+		Params.RadialDamageInnerRadius = RadialDamageInnerRadius;
+		Params.RadialDamageOuterRadius = RadialDamageOuterRadius;
+	}
 	return Params;
 }
 

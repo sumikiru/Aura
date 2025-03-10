@@ -15,4 +15,6 @@ class AURA_API UAuraArcaneShards : public UAuraDamageGameplayAbility
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "Cause Damage")
+	void CauseDamageToAllTargets(const FVector& RadialDamageOrigin = FVector::ZeroVector);
 };

@@ -10,6 +10,7 @@
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Interaction/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 /**
  * 创造一个结构体来捕获属性值。\n
@@ -154,6 +155,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	}
 
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	// 获取FAuraGameplayEffectContext
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
 	const FGameplayTagContainer* TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
@@ -183,6 +186,10 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		 * 也可以直接选择设置WarnIfNotFound = true
 		 */
 		float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeTag, false, 0.f);
+		if (DamageTypeValue <= 0.f)
+		{
+			continue;
+		}
 
 		float Resistance = 0.f;
 		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(
@@ -193,6 +200,47 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		Resistance = FMath::Clamp(Resistance, 0.f, 100.f);
 
 		DamageTypeValue *= (100.f - Resistance) / 100.f;
+
+		// 如果是Radial Damage
+		if (UAuraAbilitySystemLibrary::IsRadialDamage(EffectContextHandle))
+		{
+			/**
+			 * 1. override TakeDamage() in AuraCharacterBase
+			 * 2. create delegate OnDamageDelegate, broadcast damage received in TakeDamage()
+			 * 3. bind to OnDamageDelegate on the victim here
+			 * 4. call UGameplayStatics::ApplyRadialDamageWithFalloff() to cause damage(this will result in
+			 *		TakeDamage() being called on the victim, which will then broadcast
+			 * 5. in lambda, set DamageTypeValue to the damage received from the broadcast
+			 */
+			/**
+			 * 1. 覆写 TakeDamage 函数，通过函数获取范围技能能够造成的最终伤害
+			 * 2. 创建一个委托 OnDamageDelegate，在TakeDamage里向外广播最终伤害数值
+			 * 3. 在战斗接口声明一个函数用于返回委托，并在角色基类实现，在计算伤害时通过战斗接口获取到委托，并绑定匿名函数
+			 * 4. 调用 UGameplayStatics::ApplyRadialDamageWithFalloff 函数应用伤害，函数内会调用角色身上的TakeDamage来广播委托。
+			 * 5. 在匿名函数中，修改实际造成的伤害。
+			 */
+			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(TargetAvatar))
+			{
+				CombatInterface->GetOnDamageSignature().AddLambda(
+					[&](float DamageAmount)
+					{
+						DamageTypeValue = DamageAmount;
+					}
+				);
+			}
+			UGameplayStatics::ApplyRadialDamageWithFalloff(
+				TargetAvatar,
+				DamageTypeValue,
+				0.f,
+				UAuraAbilitySystemLibrary::GetRadialDamageOrigin(EffectContextHandle),
+				UAuraAbilitySystemLibrary::GetRadialDamageInnerRadius(EffectContextHandle),
+				UAuraAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle),
+				1.f,
+				UDamageType::StaticClass(),
+				TArray<AActor*>(),
+				SourceAvatar,
+				nullptr);
+		}
 
 		Damage += DamageTypeValue;
 	}
@@ -259,8 +307,6 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		FName("CriticalHitResistance"), FString());
 	const float CriticalHitResistanceCoefficient = CriticalHitResistanceCurve->Eval(TargetPlayerLevel);
 
-	// 获取FAuraGameplayEffectContext
-	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 	/**
 	 * 有了UAuraAbilitySystemLibrary::SetIsBlockedHit就不再需要:
 	 * FGameplayEffectContext* Context = EffectContextHandle.Get();

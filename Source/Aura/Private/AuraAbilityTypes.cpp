@@ -71,6 +71,22 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		{
 			RepBits |= 1 << 15;
 		}
+		if (bIsRadialDamage)
+		{
+			RepBits |= 1 << 16;
+			if (RadialDamageInnerRadius > 0.f)
+			{
+				RepBits |= 1 << 17;
+			}
+			if (RadialDamageOuterRadius > 0.f)
+			{
+				RepBits |= 1 << 18;
+			}
+			if (!RadialDamageOrigin.IsZero())
+			{
+				RepBits |= 1 << 19;
+			}
+		}
 	}
 
 	/**
@@ -79,7 +95,7 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 	 * 例如，在你设计模块间接口时，暂时无法判定传参类型。
 	 * 就可以通过void*传入，在函数中将指针转化你需要的类型就可以了。 
 	 */
-	Ar.SerializeBits(&RepBits, 16);
+	Ar.SerializeBits(&RepBits, 20);
 
 	if (RepBits & (1 << 0))
 	{
@@ -164,6 +180,22 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 	if (RepBits & (1 << 15))
 	{
 		KnockbackForce.NetSerialize(Ar, Map, bOutSuccess);
+	}
+	if (RepBits & (1 << 16))
+	{
+		Ar << bIsRadialDamage;
+		if (RepBits & (1 << 17))
+		{
+			Ar << RadialDamageInnerRadius;
+		}
+		if (RepBits & (1 << 17))
+		{
+			Ar << RadialDamageOuterRadius;
+		}
+		if (RepBits & (1 << 17))
+		{
+			RadialDamageOrigin.NetSerialize(Ar, Map, bOutSuccess);
+		}
 	}
 
 	if (Ar.IsLoading())

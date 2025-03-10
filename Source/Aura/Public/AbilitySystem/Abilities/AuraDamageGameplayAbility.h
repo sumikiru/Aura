@@ -18,11 +18,12 @@ class AURA_API UAuraDamageGameplayAbility : public UAuraGameplayAbility
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void CauseDamage(AActor* TargetActor);
+	UFUNCTION(BlueprintCallable, Category = "Cause Damage")
+	void CauseDamage(AActor* TargetActor, const FVector RadialDamageOrigin = FVector::ZeroVector);
 
 	UFUNCTION(BlueprintPure)
-	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
+	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr,
+	                                                            const FVector& RadialDamageOrigin = FVector::ZeroVector) const;
 
 	UFUNCTION(BlueprintPure)
 	float GetDamageAtLevel() const;
@@ -48,6 +49,12 @@ protected:
 	float KnockbackForceMagnitude = 400.f; // 击退（未死亡时）
 	UPROPERTY(EditDefaultsOnly, Category = "Damage|Impulse")
 	float KnockbackChance = 0.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Damage|Radial Damage")
+	bool bIsRadialDamage = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage|Radial Damage")
+	float RadialDamageInnerRadius = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage|Radial Damage")
+	float RadialDamageOuterRadius = 0.f;
 
 	UFUNCTION(BlueprintPure)
 	FTaggedMontage GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const;
