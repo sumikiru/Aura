@@ -19,11 +19,19 @@ class AURA_API UAuraDamageGameplayAbility : public UAuraGameplayAbility
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Cause Damage")
-	void CauseDamage(AActor* TargetActor, const FVector RadialDamageOrigin = FVector::ZeroVector);
+	void CauseDamage(AActor* TargetActor, const FVector RadialDamageOrigin = FVector::ZeroVector, bool bOverrideKnockbackDirection = false,
+	                 FVector KnockbackDirectionOverride = FVector::ZeroVector, bool bOverrideDeathImpulse = false,
+	                 FVector DeathImpulseDirectionOverride = FVector::ZeroVector, bool bOverridePitch = false, float PitchOverride = 0.f);
 
 	UFUNCTION(BlueprintPure)
 	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr,
-	                                                            const FVector& RadialDamageOrigin = FVector::ZeroVector) const;
+	                                                            const FVector& RadialDamageOrigin = FVector::ZeroVector,
+	                                                            bool bOverrideKnockbackDirection = false,
+	                                                            FVector KnockbackDirectionOverride = FVector::ZeroVector,
+	                                                            bool bOverrideDeathImpulse = false,
+	                                                            FVector DeathImpulseDirectionOverride = FVector::ZeroVector,
+	                                                            bool bOverridePitch = false,
+	                                                            float PitchOverride = 0.f) const;
 
 	UFUNCTION(BlueprintPure)
 	float GetDamageAtLevel() const;
@@ -58,4 +66,11 @@ protected:
 
 	UFUNCTION(BlueprintPure)
 	FTaggedMontage GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const;
+
+	void SetDamageEffectParamsImpulseFromPitch(AActor* TargetActor, FDamageEffectParams& Params, bool bOverridePitch, float PitchOverride,
+	                                           bool bOverrideKnockbackDirection, bool bOverrideDeathImpulse) const;
+	void OverrideParamsKnockbackForce(FDamageEffectParams& Params, bool bOverrideKnockbackDirection, FVector KnockbackDirectionOverride,
+	                                  bool bOverridePitch, float PitchOverride) const;
+	void OverrideParamsDeathImpulse(FDamageEffectParams& Params, bool bOverrideDeathImpulse, FVector DeathImpulseDirectionOverride,
+	                                bool bOverridePitch, float PitchOverride) const;
 };

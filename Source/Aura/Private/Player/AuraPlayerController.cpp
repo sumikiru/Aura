@@ -11,6 +11,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Actor/MagicCircle.h"
+#include "Aura/Aura.h"
 #include "Components/DecalComponent.h"
 #include "Components/SplineComponent.h"
 #include "GameFramework/Character.h"
@@ -148,7 +149,10 @@ void AAuraPlayerController::CursorTrace()
 		return;
 	}
 
-	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	// 如果当前处于Magic Circle指示阶段，将忽略掉场景中的角色（因此也不会高亮），避免出现CursorTrace到角色，会出现突然闪现一段位置的情况
+	// 这是因为CursorTrace到角色身上的位置，然后追踪到地面坐标，水平偏移会突然闪现一段位置
+	const ECollisionChannel TraceChannel = IsValid(MagicCircle) ? ECC_ExcludeCharacters : ECC_Visibility;
+	GetHitResultUnderCursor(TraceChannel, false, CursorHit);
 	if (!CursorHit.bBlockingHit)
 	{
 		return;
