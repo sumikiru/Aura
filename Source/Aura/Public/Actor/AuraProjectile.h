@@ -31,21 +31,26 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	void OnHit();
+	UFUNCTION(BlueprintCallable)
+	virtual void OnHit();
 	/**
 	 * 当这个Actor被显式Destroy()时调用
 	 */
 	virtual void Destroyed() override;
 	UFUNCTION()
-	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-	                          bool bFromSweep, const FHitResult& SweepResult);
+	virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	                                  int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	bool IsValidOverlap(AActor* OtherActor) const;
+
+	bool bHit = false;
+
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> LoopingSoundComponent;
 
 private:
 	// 寿命，如果一直未发生碰撞，则定时摧毁
 	UPROPERTY(EditDefaultsOnly)
 	float LifeSpan = 10.f;
-
-	bool bHit = false;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> SphereComponent;
@@ -58,7 +63,4 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> LoopingSound;
-
-	UPROPERTY()
-	TObjectPtr<UAudioComponent> LoopingSoundComponent;
 };
