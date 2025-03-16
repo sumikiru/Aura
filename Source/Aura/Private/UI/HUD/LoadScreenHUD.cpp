@@ -16,13 +16,20 @@ void ALoadScreenHUD::BeginPlay()
 	LoadScreenViewModel->InitializeLoadSlots();
 
 	LoadScreenWidget = CreateWidget<ULoadScreenWidget>(GetWorld(), LoadScreenWidgetClass);
-	LoadScreenWidget->SetIsFocusable(true);
+	/**
+	 * Note that this property is only set at construction and is not modifiable at runtime.
+	 * 错误，需要在编译阶段设置：LoadScreenWidget->SetIsFocusable(true);
+	 * 详见ULoadScreenWidget::NativeConstruct()
+	 * 或者直接在蓝图中设置WBP_LoadScreen->类默认值->可聚焦改为true
+	 */
 	LoadScreenWidget->AddToViewport();
 
 	APlayerController* PC = GetOwningPlayerController();
 	FInputModeUIOnly InputMode;
 	InputMode.SetWidgetToFocus(LoadScreenWidget->TakeWidget());
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	// 可能出现报错：Error: InputMode:UIOnly - Attempting to focus Non-Focusable widget SObjectWidget
+	// 需要在WBP_LoadScreen->类默认值->可聚焦改为true
 	PC->SetInputMode(InputMode);
 	PC->SetShowMouseCursor(true);
 

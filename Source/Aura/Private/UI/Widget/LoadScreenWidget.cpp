@@ -3,3 +3,8 @@
 
 #include "UI/Widget/LoadScreenWidget.h"
 
+void ULoadScreenWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	SetIsFocusable(true);
+}

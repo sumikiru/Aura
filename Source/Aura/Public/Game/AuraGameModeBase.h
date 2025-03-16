@@ -32,7 +32,20 @@ public:
 	ULoadScreenSaveGame* GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const;
 	// 删除存档
 	static void DeleteSlot(const FString& SlotName, int32 SlotIndex);
+	void TravelToMap(UMVVM_LoadSlot* LoadSlot);
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<USaveGame> LoadScreenSaveGameClass;
+
+	// 游戏初始地图
+	UPROPERTY(EditDefaultsOnly)
+	FString DefaultMapName;
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UWorld> DefaultMap;
+	// 使用了TSoftObjectPtr，这个指针只保存路径，如果不使用，对应的资源不会加载到场景，可以在需要时再加载。常用于延迟加载的资源（如关卡、角色、贴图等）
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FString, TSoftObjectPtr<UWorld>> Maps;
+
+protected:
+	virtual void BeginPlay() override;
 };
