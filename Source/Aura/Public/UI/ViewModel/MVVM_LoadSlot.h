@@ -31,9 +31,11 @@ public:
 
 	UPROPERTY()
 	int32 SlotIndex; // 存档槽位索引，如LoadSlot_0设置SlotIndex为0（在蓝图的InitializeSlot中执行）
-
 	// 强类型枚举类不需要TEnumAsByte<TEnum>这种包裹形式
+	UPROPERTY()
 	ESaveSlotStatus SlotStatus; // 当前存档插槽状态，如Vacant/EnterName/Taken
+	UPROPERTY()
+	FName PlayerStartTag;
 
 	void SetLoadSlotName(FString InLoadSlotName);
 	void SetPlayerName(FString InPlayerName);

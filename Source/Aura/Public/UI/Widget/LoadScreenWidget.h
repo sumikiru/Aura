@@ -15,7 +15,7 @@ class AURA_API ULoadScreenWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void NativeConstruct() override;
+	virtual void NativeConstruct() override;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void BlueprintInitializeWidget();

@@ -3,7 +3,9 @@
 
 #include "Game/AuraGameModeBase.h"
 
+#include "Game/AuraGameInstance.h"
 #include "Game/LoadScreenSaveGame.h"
+#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/ViewModel/MVVM_LoadSlot.h"
 
@@ -16,6 +18,7 @@ void AAuraGameModeBase::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 	LoadScreenSaveGame->PlayerName = LoadSlot->GetPlayerName();
 	LoadScreenSaveGame->MapName = LoadSlot->GetMapName();
 	LoadScreenSaveGame->SaveSlotStatus = ESaveSlotStatus::Taken;
+	LoadScreenSaveGame->PlayerStartTag = LoadSlot->PlayerStartTag;
 
 	UGameplayStatics::SaveGameToSlot(LoadScreenSaveGame, LoadSlot->GetLoadSlotName(), SlotIndex);
 }
@@ -45,11 +48,37 @@ void AAuraGameModeBase::DeleteSlot(const FString& SlotName, int32 SlotIndex)
 
 void AAuraGameModeBase::TravelToMap(UMVVM_LoadSlot* LoadSlot)
 {
-	const FString& SlotName = LoadSlot->GetLoadSlotName();
-	const int32 SlotIndex = LoadSlot->SlotIndex;
+	// const FString& SlotName = LoadSlot->GetLoadSlotName();
+	// const int32 SlotIndex = LoadSlot->SlotIndex;
 
 	// 传入LoadSlot以确定WorldContextObject发生的世界
 	UGameplayStatics::OpenLevelBySoftObjectPtr(LoadSlot, Maps.FindChecked(LoadSlot->GetMapName()));
+}
+
+AActor* AAuraGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
+{
+	UAuraGameInstance* AuraGameInstance = Cast<UAuraGameInstance>(GetGameInstance());
+
+	TArray<AActor*> PlayerStartActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStartActors);
+	if (PlayerStartActors.Num() > 0)
+	{
+		AActor* SelectedActor = PlayerStartActors[0];
+		for (AActor* PlayerStartActor : PlayerStartActors)
+		{
+			if (APlayerStart* PlayerStart = Cast<APlayerStart>(PlayerStartActor))
+			{
+				if (PlayerStart->PlayerStartTag == AuraGameInstance->PlayerStartTag)
+				{
+					SelectedActor = PlayerStart;
+					break;
+				}
+			}
+		}
+		return SelectedActor;
+	}
+
+	return nullptr;
 }
 
 void AAuraGameModeBase::BeginPlay()

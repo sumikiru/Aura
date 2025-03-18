@@ -33,5 +33,7 @@ public:
 	UPROPERTY()
 	FString MapName = FString("Default Map Name"); // 地图名称
 	UPROPERTY()
+	FName PlayerStartTag;
+	UPROPERTY()
 	ESaveSlotStatus SaveSlotStatus = ESaveSlotStatus::Vacant;
 };
