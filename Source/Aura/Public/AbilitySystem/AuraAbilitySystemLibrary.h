@@ -9,6 +9,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "AuraAbilitySystemLibrary.generated.h"
 
+class ULoadScreenSaveGame;
 class UAuraDamageGameplayAbility;
 struct FGameplayTag;
 struct FDamageEffectParams;
@@ -68,7 +69,7 @@ public:
 
 	// Ability System Class Defaults============================================================================
 	/**
-	 * 初始化角色属性值
+	 * 初始化角色属性值（包含玩家和敌人）
 	 * @param WorldContextObject 一个世界中已经存在的物体，是一个UObject的常量指针
 	 * @param CharacterClass 角色类型，比如ECharacterClass::Elementalist
 	 * @param Level
@@ -77,6 +78,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults")
 	static void InitializeDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level,
 	                                        UAbilitySystemComponent* ASC);
+
+	/** 从存档中初始化角色属性（只包含玩家） */
+	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults")
+	static void InitializeDefaultAttributesFromSaveData(const UObject* WorldContextObject, UAbilitySystemComponent* ASC,
+	                                                    ULoadScreenSaveGame* SaveGame);
 
 	/**
 	 * 初始化角色能力

@@ -40,10 +40,12 @@ public:
 	void SetLoadSlotName(FString InLoadSlotName);
 	void SetPlayerName(FString InPlayerName);
 	void SetMapName(FString InMapName);
+	void SetPlayerLevel(int32 InPlayerLevel);
 
 	FString GetLoadSlotName() const { return LoadSlotName; }
 	FString GetPlayerName() const { return PlayerName; }
 	FString GetMapName() const { return MapName; }
+	int32 GetPlayerLevel() const { return PlayerLevel; }
 
 private:
 	// 注意：以下成员需要在蓝图中进行视图绑定，并且在以下函数中逐个设置
@@ -61,4 +63,6 @@ private:
 	FString PlayerName; // 游戏存档名，如"Dungeon Map Saved 1"
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
 	FString MapName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
+	int32 PlayerLevel;
 };

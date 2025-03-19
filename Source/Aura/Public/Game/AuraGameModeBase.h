@@ -32,6 +32,9 @@ public:
 	ULoadScreenSaveGame* GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const;
 	// 删除存档
 	static void DeleteSlot(const FString& SlotName, int32 SlotIndex);
+	// 检索游戏内存档信息
+	ULoadScreenSaveGame* RetrieveInGameSaveData();
+	void SaveInGameProgressData(ULoadScreenSaveGame* SaveObject);
 	void TravelToMap(UMVVM_LoadSlot* LoadSlot);
 
 	UPROPERTY(EditDefaultsOnly)
