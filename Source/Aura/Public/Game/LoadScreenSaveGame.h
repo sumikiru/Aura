@@ -19,6 +19,36 @@ enum class ESaveSlotStatus : uint8
 };
 
 USTRUCT(BlueprintType)
+struct FSavedActor
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName ActorName = FName();
+	UPROPERTY()
+	FTransform Transform = FTransform(); // 位置、旋转等
+	UPROPERTY()
+	TArray<uint8> Bytes; // 来自Actor（仅对于那些标记为SaveGame的Actor）的序列化变量
+};
+
+// 重写==，用于AddUnique()
+inline bool operator==(const FSavedActor& Left, const FSavedActor& Right)
+{
+	return Left.ActorName == Right.ActorName;
+}
+
+USTRUCT(BlueprintType)
+struct FSavedMap
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString MapAssetName = FString();
+	UPROPERTY()
+	TArray<FSavedActor> SavedActors;
+};
+
+USTRUCT(BlueprintType)
 struct FSavedAbility
 {
 	GENERATED_BODY()
@@ -90,4 +120,10 @@ public:
 	/** Abilities */
 	UPROPERTY()
 	TArray<FSavedAbility> SavedAbilities;
+
+	UPROPERTY()
+	TArray<FSavedMap> SavedMaps;
+
+	FSavedMap GetSavedMapWithMapName(const FString& InMapName) const;
+	bool HasMap(const FString& InMapName) const;
 };

@@ -35,6 +35,8 @@ public:
 	// 检索游戏内存档信息
 	ULoadScreenSaveGame* RetrieveInGameSaveData();
 	void SaveInGameProgressData(ULoadScreenSaveGame* SaveObject);
+	void SaveWorldState(UWorld* World) const;
+	void LoadWorldState(UWorld* World) const;
 	void TravelToMap(UMVVM_LoadSlot* LoadSlot);
 
 	UPROPERTY(EditDefaultsOnly)
