@@ -11,6 +11,7 @@
 #include "NiagaraComponent.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAttributeSet.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 #include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -77,6 +78,11 @@ void AAuraCharacter::LoadProgress()
 		}
 		else
 		{
+			if (UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent))
+			{
+				AuraASC->AddCharacterAbilitiesFromSaveData(SaveData);
+			}
+
 			if (AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState()))
 			{
 				AuraPlayerState->SetLevel(SaveData->PlayerLevel);
@@ -224,6 +230,35 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 		SaveData->Vigor = UAuraAttributeSet::GetVigorAttribute().GetNumericValue(GetAttributeSet());
 
 		SaveData->bFirstTimeLoadIn = false;
+
+		// Gameplay Abilities
+		if (!HasAuthority())
+		{
+			return;
+		}
+
+		UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent);
+		FForEachAbility SaveAbilityDelegate;
+		SaveData->SavedAbilities.Empty();	// 别忘了
+		SaveAbilityDelegate.BindLambda([this, AuraASC, SaveData](const FGameplayAbilitySpec& AbilitySpec)
+		{
+			const FGameplayTag& AbilityTag = AuraASC->GetAbilityTagFromSpec(AbilitySpec);
+			UAbilityInfo* AbilityInfo = UAuraAbilitySystemLibrary::GetAbilityInfo(this);
+			FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
+
+			FSavedAbility SavedAbility;
+			SavedAbility.GameplayAbility = Info.Ability;
+			SavedAbility.AbilityTag = AbilityTag;
+			SavedAbility.AbilityStatus = AuraASC->GetSlotFromAbilityTag(AbilityTag);
+			SavedAbility.AbilitySlot = AuraASC->GetStatusFromAbilityTag(AbilityTag);
+			SavedAbility.AbilityType = Info.AbilityType;
+			SavedAbility.AbilityLevel = AbilitySpec.Level;
+
+			// 注意：需要重载FSavedAbility的==运算符，用于比较从而确认是否相等
+			SaveData->SavedAbilities.AddUnique(SavedAbility);
+		});
+		AuraASC->ForEachAbility(SaveAbilityDelegate);
+
 		AuraGameMode->SaveInGameProgressData(SaveData);
 	}
 }

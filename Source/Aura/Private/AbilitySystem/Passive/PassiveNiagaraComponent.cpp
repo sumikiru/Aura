@@ -4,6 +4,7 @@
 #include "AbilitySystem/Passive/PassiveNiagaraComponent.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Interaction/CombatInterface.h"
 
@@ -21,6 +22,7 @@ void UPassiveNiagaraComponent::BeginPlay()
 		UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner())))
 	{
 		AuraASC->ActivatePassiveEffectDelegate.AddUObject(this, &UPassiveNiagaraComponent::OnPassiveActivate);
+		ActivateIfEquipped(AuraASC);
 	}
 	// 如果ASC未初始化，通过接口ICombatInterface监听ASC注册事件。确保即使 ASC 未立即创建，也能在其注册后完成事件绑定。
 	else if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetOwner()))
@@ -33,6 +35,7 @@ void UPassiveNiagaraComponent::BeginPlay()
 				if (UAuraAbilitySystemComponent* InAuraASC = Cast<UAuraAbilitySystemComponent>(InASC))
 				{
 					InAuraASC->ActivatePassiveEffectDelegate.AddUObject(this, &UPassiveNiagaraComponent::OnPassiveActivate);
+					ActivateIfEquipped(InAuraASC);
 				}
 			}
 		);
@@ -53,5 +56,17 @@ void UPassiveNiagaraComponent::OnPassiveActivate(const FGameplayTag& AbilityTag,
 	else
 	{
 		Deactivate();
+	}
+}
+
+void UPassiveNiagaraComponent::ActivateIfEquipped(UAuraAbilitySystemComponent* AuraASC)
+{
+	const bool bStartupAbilitiesActivates = AuraASC->bStartupAbilitiesGiven;
+	if (bStartupAbilitiesActivates)
+	{
+		if (AuraASC->GetStatusFromAbilityTag(PassiveSpellTag).MatchesTagExact(FAuraGameplayTags::Get().Abilities_Status_Equipped))
+		{
+			Activate();
+		}
 	}
 }
