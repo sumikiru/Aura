@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+class IHighlightInterface;
 class AMagicCircle;
 class UNiagaraSystem;
 class UDamageTextComponent;
@@ -16,7 +17,13 @@ class UAuraAbilitySystemComponent;
 class UAuraInputConfig;
 struct FInputActionValue;
 class UInputAction;
-class IEnemyInterface;
+
+enum class ETargetingStatus : uint8
+{
+	TargetingEnemy,
+	TargetingNonEnemy,
+	NotTargeting
+};
 
 /**
  * 
@@ -35,9 +42,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ShowMagicCircle(UMaterialInstance* DecalMaterial = nullptr);
-	UFUNCTION(BlueprintCallable) 
+	UFUNCTION(BlueprintCallable)
 	void HideMagicCircle();
-	
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -61,8 +68,12 @@ private:
 	 * TObjPtr作为UPROPERTY成员时可以完全替换裸指针，且在release版本时完全等于裸指针
 	 */
 	FHitResult CursorHit;
-	IEnemyInterface* LastActor = nullptr;
-	IEnemyInterface* CurrentActor = nullptr;
+	UPROPERTY()
+	TObjectPtr<AActor> LastActor = nullptr;
+	UPROPERTY()
+	TObjectPtr<AActor> CurrentActor = nullptr;
+	static void HighlightActor(AActor* InActor);
+	static void UnHighlightActor(AActor* InActor);
 
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);
@@ -83,7 +94,7 @@ private:
 	float ShortPressThreshold = 0.5f;
 	bool bAutoRunning = false;
 	/* 用于确定按下鼠标左键时，是要进行移动还是朝目标使用技能 */
-	bool bIsTargeting = false;
+	ETargetingStatus TargetingStatus = ETargetingStatus::NotTargeting;
 
 	/** 进入目标半径范围后停下 */
 	UPROPERTY(EditDefaultsOnly)
@@ -103,7 +114,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AMagicCircle> MagicCircleClass;
 	UPROPERTY()

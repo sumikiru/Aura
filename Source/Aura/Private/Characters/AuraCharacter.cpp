@@ -244,7 +244,7 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 
 		UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent);
 		FForEachAbility SaveAbilityDelegate;
-		SaveData->SavedAbilities.Empty();	// 别忘了
+		SaveData->SavedAbilities.Empty(); // 别忘了
 		SaveAbilityDelegate.BindLambda([this, AuraASC, SaveData](const FGameplayAbilitySpec& AbilitySpec)
 		{
 			const FGameplayTag& AbilityTag = AuraASC->GetAbilityTagFromSpec(AbilitySpec);

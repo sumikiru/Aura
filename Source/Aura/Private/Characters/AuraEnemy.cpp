@@ -33,6 +33,11 @@ AAuraEnemy::AAuraEnemy()
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBarWidgetComponent"));
 	HealthBar->SetupAttachment(GetRootComponent());
 
+	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED); //自定义深度模板值
+	GetMesh()->MarkRenderStateDirty(); //强制立即更新
+	Weapon->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
+	Weapon->MarkRenderStateDirty();
+
 	BaseWalkSpeed = 250.f;
 }
 
@@ -67,22 +72,25 @@ void AAuraEnemy::ReceiveKnockback(const FVector& KnockbackForce)
 	Super::ReceiveKnockback(KnockbackForce);
 }
 
-void AAuraEnemy::HighlightActor()
+void AAuraEnemy::HighlightActor_Implementation()
 {
 	/**
 	 * 记得先加入PostProcessVolume到World中，并且渲染功能->后期处理材质->添加PP_Highlight
 	 * 然后到项目设置中搜索custom depth，修改自定义深度-模板通道为"启用模板"
 	 */
 	GetMesh()->SetRenderCustomDepth(true); //渲染自定义深度通道
-	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED); //自定义深度模板值
 	Weapon->SetRenderCustomDepth(true);
-	Weapon->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
 }
 
-void AAuraEnemy::UnHighlightActor()
+void AAuraEnemy::UnHighlightActor_Implementation()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
+}
+
+void AAuraEnemy::SetMoveToLocation_Implementation(FVector& OutDestination)
+{
+	// 不改变OutDestination
 }
 
 int32 AAuraEnemy::GetPlayerLevel_Implementation()

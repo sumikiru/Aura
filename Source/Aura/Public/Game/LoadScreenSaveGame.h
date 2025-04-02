@@ -64,7 +64,7 @@ struct FSavedAbility
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FGameplayTag AbilityType = FGameplayTag();
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	int32 AbilityLevel;
+	int32 AbilityLevel = 0;
 };
 
 inline bool operator==(const FSavedAbility& Left, const FSavedAbility& Right)
@@ -90,6 +90,8 @@ public:
 	FString PlayerName = FString("Default Name"); // 存档名称
 	UPROPERTY()
 	FString MapName = FString("Default Map Name"); // 地图名称
+	UPROPERTY()
+	FString MapAssetName = FString("Default Map Asset Name");
 	UPROPERTY()
 	FName PlayerStartTag;
 	UPROPERTY()
