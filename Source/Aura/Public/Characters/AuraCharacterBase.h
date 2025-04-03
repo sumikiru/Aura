@@ -72,6 +72,8 @@ public:
 	UFUNCTION()
 	virtual void OnRep_Burned();
 
+	void SetCharacterClass(const ECharacterClass& InCharacterClass) { CharacterClass = InCharacterClass; }
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo();
