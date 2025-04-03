@@ -95,6 +95,7 @@ protected:
 	FName TailSocketName;
 
 	/** 不必将其设置为需要复制的变量，直接在MulticastHandleDeath()中修改即可 */
+	UPROPERTY(BlueprintReadOnly)
 	bool bDead = false;
 
 	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);

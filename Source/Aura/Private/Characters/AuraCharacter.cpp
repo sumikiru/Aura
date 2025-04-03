@@ -289,6 +289,25 @@ int32 AAuraCharacter::GetPlayerLevel_Implementation()
 	return AuraPlayerState->GetPlayerLevel();
 }
 
+void AAuraCharacter::Die(const FVector& DeathImpulse)
+{
+	Super::Die(DeathImpulse);
+
+	// 目的是Delay一段时间后再执行AAuraGameModeBase::PlayerDied
+	// 由于这是其他类中的方法且有参数，所以借助FTimerDelegate并BindLambda比较方便
+	FTimerDelegate DeathTimerDelegate;
+	DeathTimerDelegate.BindLambda([this]()
+	{
+		AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this));
+		if (AuraGameMode)
+		{
+			AuraGameMode->PlayerDied(this);
+		}
+	});
+	GetWorldTimerManager().SetTimer(DeathTimerHandle, DeathTimerDelegate, DeathTime, false);
+	TopDownCameraComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+}
+
 // 实现眩晕效果同步
 void AAuraCharacter::OnRep_Stunned()
 {

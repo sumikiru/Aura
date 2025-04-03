@@ -36,6 +36,8 @@ public:
 	ESaveSlotStatus SlotStatus; // 当前存档插槽状态，如Vacant/EnterName/Taken
 	UPROPERTY()
 	FName PlayerStartTag;
+	UPROPERTY()
+	FString MapAssetName;
 
 	void SetLoadSlotName(FString InLoadSlotName);
 	void SetPlayerName(FString InPlayerName);
