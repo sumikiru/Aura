@@ -105,6 +105,7 @@ void AAuraEnemy::Die(const FVector& DeathImpulse)
 	{
 		AuraAIController->GetBlackboardComponent()->SetValueAsBool(BB_DeadKey, true);
 	}
+	SpawnLoot();
 	Super::Die(DeathImpulse);
 }
 

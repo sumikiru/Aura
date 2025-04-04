@@ -88,4 +88,7 @@ protected:
 	/**记得还要在BP_EnemyBase中设置Pawn->AI控制器类为BP_AuraAIController*/
 	UPROPERTY()
 	TObjectPtr<AAuraAIController> AuraAIController;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SpawnLoot();
 };

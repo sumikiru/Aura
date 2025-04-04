@@ -64,7 +64,7 @@ struct FSavedAbility
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FGameplayTag AbilityType = FGameplayTag();
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	int32 AbilityLevel = 0;
+	int32 AbilityLevel = 1;
 };
 
 inline bool operator==(const FSavedAbility& Left, const FSavedAbility& Right)

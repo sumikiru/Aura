@@ -9,6 +9,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "AuraAbilitySystemLibrary.generated.h"
 
+class ULootTiers;
 class ULoadScreenSaveGame;
 class UAuraDamageGameplayAbility;
 struct FGameplayTag;
@@ -107,6 +108,11 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults")
 	static UAbilityInfo* GetAbilityInfo(const UObject* WorldContextObject);
+	/**
+	 * 获取战利品掉落信息
+	 */
+	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults", meta=(DefaultToSelf = "WorldContextObject"))
+	static ULootTiers* GetLootTiersInfo(const UObject* WorldContextObject);
 
 	// Effect Context Getters================================================================================
 	/** 是否BlockHit */
